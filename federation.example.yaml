@@ -23,65 +23,19 @@ defaults:
 
 # Federated endpoints
 endpoints:
-  # Example: External segment activation service
-  - name: "segment-activator"
-    address: "segments.example.com:50051"
-    description: "External segment activation service"
+  # Rust RTB agent - demo segment, deal, and bid shading service
+  - name: "rust-rtb-agent"
+    address: "localhost:50053"
+    description: "Rust RTB agent - demo segment, deal, and bid shading service"
     service: "RTBExtensionPoint"
     applicable_intents:
       - "ACTIVATE_SEGMENTS"
-    priority: 1                        # Lower = called first
-    enabled: true
-    timeout_ms: 50                     # Override default timeout
-
-  # Example: Deal management service
-  - name: "deal-manager"
-    address: "deals.example.com:50051"
-    description: "Deal activation and suppression service"
-    service: "RTBExtensionPoint"
-    applicable_intents:
       - "ACTIVATE_DEALS"
-      - "SUPPRESS_DEALS"
-      - "ADJUST_DEAL_FLOOR"
-      - "ADJUST_DEAL_MARGIN"
-    priority: 1                        # Same priority = called in parallel
-    enabled: true
-
-  # Example: Bid shading service with TLS
-  - name: "bid-shader"
-    address: "bidshade.secure.example.com:443"
-    description: "ML-based bid shading service"
-    service: "RTBExtensionPoint"
-    applicable_intents:
       - "BID_SHADE"
-    priority: 2                        # Called after priority 1 endpoints complete
-    enabled: true
-    timeout_ms: 75
-    tls:
-      enabled: true
-      insecure: false
-      ca_file: "/etc/ssl/certs/ca-certificates.crt"
-
-  # Example: Disabled endpoint (for reference)
-  - name: "legacy-service"
-    address: "legacy.example.com:50051"
-    description: "Legacy service (disabled)"
-    service: "RTBExtensionPoint"
-    applicable_intents:
-      - "ACTIVATE_SEGMENTS"
-    priority: 10
-    enabled: false                     # Disabled endpoint
-
-  # Example: Local development endpoint
-  - name: "local-agent"
-    address: "localhost:50052"
-    description: "Local development agent"
-    service: "RTBExtensionPoint"
-    applicable_intents:
-      - "ACTIVATE_SEGMENTS"
-      - "ACTIVATE_DEALS"
     priority: 1
-    enabled: false                     # Enable for local testing
+    enabled: true
+    timeout_ms: 500
     metadata:
-      environment: "development"
-      owner: "dev-team"
+      language: "rust"
+      binary: "rust/target/release/agentic-rtb-framework-service"
+

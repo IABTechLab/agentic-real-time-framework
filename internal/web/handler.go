@@ -262,6 +262,68 @@ func (h *Handler) loadDefaultSamples() {
 		},
 	}
 
+	h.samples["rust-federation"] = Sample{
+		Name:        "Rust Agent Federation",
+		Description: "Test federation with the Rust RTB agent (auction-456 with ACTIVATE_SEGMENTS and ACTIVATE_DEALS)",
+		Payload: map[string]interface{}{
+			"id":                  "auction-456",
+			"tmax":                500,
+			"lifecycle":           "LIFECYCLE_PUBLISHER_BID_REQUEST",
+			"originator":          map[string]interface{}{"type": "TYPE_SSP", "id": "ssp-federation-001"},
+			"applicable_intents":  []string{"ACTIVATE_SEGMENTS", "ACTIVATE_DEALS"},
+			"federate":            true,
+			"federate_endpoints":  []string{"rust-rtb-agent"},
+			"bid_request": map[string]interface{}{
+				"id": "auction-456",
+				"imp": []interface{}{
+					map[string]interface{}{
+						"id": "imp-1",
+						"video": map[string]interface{}{
+							"mimes":       []string{"video/mp4"},
+							"minduration": 15,
+							"maxduration": 30,
+							"w":           640,
+							"h":           480,
+						},
+						"bidfloor":    8.00,
+						"bidfloorcur": "USD",
+					},
+				},
+				"site": map[string]interface{}{
+					"id":     "site-789",
+					"domain": "streaming.example.com",
+					"cat":    []string{"IAB1-6"},
+					"page":   "https://streaming.example.com/live",
+				},
+				"user": map[string]interface{}{
+					"id":     "user-456",
+					"yob":    1985,
+					"gender": "F",
+					"data": []interface{}{
+						map[string]interface{}{
+							"id":   "data-provider-2",
+							"name": "Example DMP",
+							"segment": []interface{}{
+								map[string]interface{}{
+									"id":   "seg-video",
+									"name": "Video Enthusiast",
+								},
+							},
+						},
+					},
+				},
+				"device": map[string]interface{}{
+					"ua": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36",
+					"ip": "10.0.0.1",
+					"geo": map[string]interface{}{
+						"country": "USA",
+						"region":  "NY",
+					},
+				},
+			},
+		},
+	}
+
 	h.samples["multi-imp"] = Sample{
 		Name:        "Multi-Impression Request",
 		Description: "A request with multiple impression opportunities",

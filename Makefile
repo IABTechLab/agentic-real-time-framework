@@ -24,6 +24,19 @@ run-web: build
 test:
 	go test ./...
 
+# Rust build and run targets
+RUST_BINARY=rust/target/release/agentic-rtb-framework-service
+
+.PHONY: build-rust run-rust build-all
+
+build-rust:
+	cd rust && cargo build --release
+
+run-rust: build-rust
+	ARTF_GRPC_SERVER_PORT=50053 ARTF_HTTP_SERVER_PORT=8082 $(RUST_BINARY)
+
+build-all: build build-rust
+
 # Protobuf targets
 
 bindings:

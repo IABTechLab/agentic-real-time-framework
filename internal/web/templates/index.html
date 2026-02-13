@@ -1158,9 +1158,9 @@
             const tmax = parseInt(document.getElementById('tmax').value) || 100;
             const payloadText = document.getElementById('payload').value;
 
-            let bidRequest, bidResponse;
+            let bidRequest, bidResponse, payload;
             try {
-                const payload = JSON.parse(payloadText);
+                payload = JSON.parse(payloadText);
                 bidRequest = payload.bid_request || payload;
                 bidResponse = payload.bid_response || null;
             } catch (e) {
@@ -1176,18 +1176,25 @@
             try {
                 const startTime = performance.now();
 
+                const args = {
+                    id: requestId,
+                    tmax: tmax,
+                    bid_request: bidRequest,
+                    ...(bidResponse && { bid_response: bidResponse }),
+                    ...(payload.lifecycle && { lifecycle: payload.lifecycle }),
+                    ...(payload.originator && { originator: payload.originator }),
+                    ...(payload.applicable_intents && { applicable_intents: payload.applicable_intents }),
+                    ...(payload.federate && { federate: payload.federate }),
+                    ...(payload.federate_endpoints && { federate_endpoints: payload.federate_endpoints })
+                };
+
                 const toolRequest = {
                     jsonrpc: '2.0',
                     id: Date.now(),
                     method: 'tools/call',
                     params: {
                         name: 'extend_rtb',
-                        arguments: {
-                            id: requestId,
-                            tmax: tmax,
-                            bid_request: bidRequest,
-                            ...(bidResponse && { bid_response: bidResponse })
-                        }
+                        arguments: args
                     }
                 };
 

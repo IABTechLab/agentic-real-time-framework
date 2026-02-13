@@ -19,7 +19,7 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	RTBExtensionPoint_GetMutations_FullMethodName = "/com.iabtechlab.bidstream.mutation.v1.RTBExtensionPoint/GetMutations"
+	RTBExtensionPoint_GetMutations_FullMethodName = "/com.iabtechlab.bidstream.mutation.services.v1.RTBExtensionPoint/GetMutations"
 )
 
 // RTBExtensionPointClient is the client API for RTBExtensionPoint service.
@@ -110,7 +110,7 @@ func _RTBExtensionPoint_GetMutations_Handler(srv interface{}, ctx context.Contex
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var RTBExtensionPoint_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "com.iabtechlab.bidstream.mutation.v1.RTBExtensionPoint",
+	ServiceName: "com.iabtechlab.bidstream.mutation.services.v1.RTBExtensionPoint",
 	HandlerType: (*RTBExtensionPointServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
