@@ -5,6 +5,9 @@ package com.iabtechlab.bidstream.mutation.v1;
 // Import OpenRTB definitions for BidRequest and BidResponse
 import "com/iabtechlab/openrtb/v2.6/openrtb.proto";
 
+// Import Privacy Context Extension
+import "privacy_context.proto";
+
 // ------------------- Messages -------------------
 
 message RTBRequest {
@@ -36,6 +39,9 @@ message RTBRequest {
 
   message Ext {
     extensions 500 to max;
+    
+    // Privacy Context Extension (field 600 in extension range)
+    com.iabtechlab.bidstream.privacy.v1.PrivacyContext privacy_context = 600;
   }
 }
 
@@ -101,6 +107,9 @@ message Mutation {
 
     // Content data
     DataPayload content_data = 104;
+
+    // Privacy validation result
+    com.iabtechlab.bidstream.privacy.v1.PrivacyValidationPayload privacy_validation = 105;
   }
 
   // Reserved for experimental/test payloads
@@ -142,6 +151,9 @@ enum Intent {
 
   // Add extended content IDs
   ADD_CIDS = 8;
+
+  // Validate privacy context and enforce constraints
+  VALIDATE_PRIVACY = 9;
 
   // More intents can be added in the future
 
