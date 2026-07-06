@@ -10,6 +10,8 @@ mod bidder;
 mod config;
 mod mutation;
 mod proto;
+#[cfg(test)]
+mod sample_tests;
 mod service;
 
 use crate::config::{Config, API_VERSION, MODEL_VERSION};
