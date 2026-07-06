@@ -6,7 +6,15 @@ use crate::mutation::types::{
 };
 use crate::proto::com::iabtechlab::bidstream::mutation::v1::{RtbRequest, RtbResponse};
 
-/// Evaluate the `RtbRequest` and return an `RtbResponse`.
+/// True when `intent` may be returned given the request's applicable intents.
+/// An empty list means all intents are applicable, matching the Go
+/// implementation's `IsIntentApplicable` semantics.
+fn is_intent_applicable(intent: i32, applicable_intents: &[i32]) -> bool {
+    applicable_intents.is_empty() || applicable_intents.contains(&intent)
+}
+
+/// Evaluate the `RtbRequest` and return an `RtbResponse`. Mutations are
+/// limited to the intents the request declared applicable.
 pub async fn evaluate(req: RtbRequest) -> RtbResponse {
     // For demonstration purposes, we will create a static response
     // In a real-world scenario, you would implement logic to evaluate the request
@@ -22,7 +30,9 @@ pub async fn evaluate(req: RtbRequest) -> RtbResponse {
         .and_then(|bid_request| bid_request.id.clone())
         .unwrap_or_default();
 
-    match auction_id.as_str() {
+    let applicable_intents = req.applicable_intents.clone();
+
+    let mut response = match auction_id.as_str() {
         "auction-123" => RtbResponse {
             id: req.id,
             mutations: vec![
@@ -71,7 +81,13 @@ pub async fn evaluate(req: RtbRequest) -> RtbResponse {
             mutations: vec![],
             metadata: Some(metadata),
         },
-    }
+    };
+
+    response
+        .mutations
+        .retain(|mutation| is_intent_applicable(mutation.intent, &applicable_intents));
+
+    response
 }
 
 #[cfg(test)]
@@ -154,6 +170,34 @@ mod tests {
     #[tokio::test]
     async fn unknown_auction_returns_no_mutations() {
         let response = evaluate(request("req-1", "auction-unknown")).await;
+        assert!(response.mutations.is_empty());
+        assert!(response.metadata.is_some());
+    }
+
+    #[tokio::test]
+    async fn mutations_are_limited_to_applicable_intents() {
+        let mut req = request("req-1", "auction-789");
+        req.applicable_intents = vec![Intent::BidShade as i32];
+
+        let response = evaluate(req).await;
+
+        assert_eq!(response.mutations.len(), 1);
+        assert_eq!(response.mutations[0].intent, Intent::BidShade as i32);
+    }
+
+    #[tokio::test]
+    async fn empty_applicable_intents_allows_all_mutations() {
+        let response = evaluate(request("req-1", "auction-789")).await;
+        assert_eq!(response.mutations.len(), 3);
+    }
+
+    #[tokio::test]
+    async fn no_matching_applicable_intent_returns_no_mutations() {
+        let mut req = request("req-1", "auction-123");
+        req.applicable_intents = vec![Intent::AdjustDealFloor as i32];
+
+        let response = evaluate(req).await;
+
         assert!(response.mutations.is_empty());
         assert!(response.metadata.is_some());
     }
