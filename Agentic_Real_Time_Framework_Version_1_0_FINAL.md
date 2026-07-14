@@ -5,7 +5,7 @@
 **Version 1.0**
 *Released November 12, 2025*
 
-Please email support@iabtechlab.com for public comments and questions. This document is available online at https://iabtechlab.com/standards/artf/
+Please email support@iabtechlab.com for questions and feedback. This document is available online at https://iabtechlab.com/standards/artf/
 
 © 2025 IAB Technology Laboratory
 
