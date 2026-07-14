@@ -9,17 +9,15 @@ Please email support@iabtechlab.com for public comments and questions. This docu
 
 © 2025 IAB Technology Laboratory
 
-*DRAFT for PUBLIC COMMENT — Send comments to support@iabtechlab.com*
-
 ---
 
 ## About this document
 
-The Agentic RTB Framework specification defines a foundation for implementing agent services which operate within a host platform and that the orchestrating platform can call directly to accomplish a shared goal. The model leverages containers which are deployed into the infrastructure of a host to enable delegation of critical aspects of bidstream processing to service agents in a consistent manner, with minimal cost, latency and operational impacts. The framework enables this by establishing standard requirements for container runtime behavior and by defining an API which enables reliable, protected and private bidstream mutation.
+The Agentic Real Time Framework specification defines a foundation for implementing agent services which operate within a host platform and that the orchestrating platform can call directly to accomplish a shared goal. The model leverages containers which are deployed into the infrastructure of a host to enable delegation of critical aspects of bidstream processing to service agents in a consistent manner, with minimal cost, latency and operational impacts. The framework enables this by establishing standard requirements for container runtime behavior and by defining an API which enables reliable, protected and private bidstream mutation.
 
 With this approach, service providers package their offering once and deploy it to any standard-compliant platform, which means they are able to focus on their unique value proposition while offloading operational concerns and scaling to the host platforms. It also creates new possibilities for innovation because host platforms maintain control of data and SLAs and therefore can provide greater access to data and more interaction opportunities to service agents without concerns about leakage, misappropriation or latency.
 
-The Agentic RTB Framework provides significant value to host platforms which are able to "drop-in" new capabilities with minimal integration overhead and compose bid processing pipelines configured specifically for their target use cases. The standard also enables platforms to adapt quickly to changing market demands by simply adding, updating and removing components as needed, all while maintaining control of operational costs and requirements and without incurring significant integration overhead and cost.
+The Agentic Real Time Framework provides significant value to host platforms which are able to "drop-in" new capabilities with minimal integration overhead and compose bid processing pipelines configured specifically for their target use cases. The standard also enables platforms to adapt quickly to changing market demands by simply adding, updating and removing components as needed, all while maintaining control of operational costs and requirements and without incurring significant integration overhead and cost.
 
 While this approach is agentic in nature, the primary focus here is on systematic agentic integration (service to service integration), but autonomic agentic functionality (model to service) is also envisioned as part of this specification as the integrating technology matures.
 
@@ -111,8 +109,7 @@ THE STANDARDS, THE SPECIFICATIONS, THE MEASUREMENT GUIDELINES, AND ANY OTHER MAT
   - [Service Naming](#service-naming)
 - [API Design](#api-design)
   - [Example Extension Point](#example-extension-point)
-    - [Request Message](#request-message)
-    - [AgenticRTB Specific Requirements](#agenticrtb-specific-requirements)
+    - [Agentic Real Time Specific Requirements](#agentic-real-time-specific-requirements)
     - [Extension Response](#extension-response)
   - [Example - Audience Segments - Activating Cohorts](#example---audience-segments---activating-cohorts)
   - [Example - Complex Orchestration](#example---complex-orchestration)
@@ -321,7 +318,7 @@ message RTBRequest {
 
 This forms the backbone of the extension system. Each individual request exposes a single rpc and a single stream mechanism for a given extension point. Right now the spec does anticipate the need to support multiple called endpoints so that the same container could support multiple different service requests.
 
-#### AgenticRTB Specific Requirements
+#### Agentic Real Time Specific Requirements
 
 | Field | Type | Description |
 |---|---|---|
