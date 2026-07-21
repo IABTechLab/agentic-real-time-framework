@@ -1,8 +1,8 @@
 ![IAB Tech Lab](https://drive.google.com/uc?id=10yoBoG5uRETSXRrnJPUDuONujvADrSG1)
 
-# **Agentic RTB Framework**
+# **Agentic Real Time Framework**
 
-#### About Agentic RTB Framework (ARTF)
+#### About Agentic Real Time Framework (ARTF)
 https://iabtechlab.com/standards/artf/
 
 #### How to get started
@@ -23,7 +23,7 @@ For more information, or to get involved, please email support@iabtechlab.com.
 
 ## Go Reference Implementation
 
-A Go implementation of the IAB Tech Lab's **Agentic RTB Framework (ARTF) v1.0** specification for agent-driven containers in OpenRTB and Digital Advertising.
+A Go implementation of the IAB Tech Lab's **Agentic Real Time Framework (ARTF) v1.0** specification for agent-driven containers in OpenRTB and Digital Advertising.
 
 ### Overview
 
