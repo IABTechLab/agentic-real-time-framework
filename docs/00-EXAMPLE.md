@@ -25,7 +25,7 @@ The Agentic RTB Framework (ARTF) defines a standard for implementing agent servi
 
 - **Segment Activation** - Activate user segments based on bid request data
 - **Deal Management** - Activate, suppress, and adjust deals dynamically
-- **Bid Shading** - Optimize bid prices using intelligent pricing strategies
+- **Bid Shading**, **Bid Valuation** - Optimize bid prices using intelligent pricing strategies
 - **Metrics Addition** - Add viewability and other metrics to impressions
 
 ### Key Principles
@@ -114,6 +114,7 @@ The request message sent from the orchestrator to the agent.
 | `tmax` | int32 | Yes | Maximum response time in milliseconds |
 | `bid_request` | BidRequest | Yes | OpenRTB v2.6 bid request |
 | `bid_response` | BidResponse | No | OpenRTB v2.6 bid response (if available) |
+| `object_ids` | IDsPayload | No | Optional intent-specific object IDs associated with the bid request |
 | `ext` | Extensions | No | Extension fields |
 
 ### RTBResponse
@@ -193,6 +194,17 @@ message AdjustBidPayload {
 }
 ```
 
+#### AdjustBidValuationPayload
+
+Used for bid valuation responses.
+
+```protobuf
+message AdjustBidValuationPayload {
+  repeated string id = 1;
+  repeated float value_factor = 2;
+}
+```
+
 #### AddMetricsPayload
 
 Used for adding impression metrics.
@@ -219,6 +231,8 @@ message AddMetricsPayload {
 | 5 | `ADJUST_DEAL_MARGIN` | Adjust the deal margin of a specific deal |
 | 6 | `BID_SHADE` | Adjust the bid price of a specific bid |
 | 7 | `ADD_METRICS` | Add metrics to an impression |
+| 8 | `ADD_CIDS` | Add content IDs to an impression |
+| 9 | `BID_VALUATION` | Adjust the perceived values of potential bids |
 
 ### Operation Enum
 
@@ -239,6 +253,7 @@ message AddMetricsPayload {
 | `ADJUST_DEAL_FLOOR` | AdjustDealPayload | `/imp/{id}/pmp/deals/{dealId}` |
 | `ADJUST_DEAL_MARGIN` | AdjustDealPayload | `/imp/{id}/pmp/deals/{dealId}` |
 | `BID_SHADE` | AdjustBidPayload | `/seatbid/{seat}/bid/{bidId}` |
+| `BID_VALUATION` | AdjustBidValuationPayload |  |
 | `ADD_METRICS` | AddMetricsPayload | `/imp/{id}/metric` |
 
 ---
@@ -456,6 +471,23 @@ The container image must include an `agent-manifest` label with JSON metadata:
   "path": "/seatbid/seat-1/bid/bid-123",
   "adjust_bid": {
     "price": 4.25
+  }
+}
+```
+
+### Bid Valuation
+
+```json
+{
+  "intent": "BID_VALUATION",
+  "op": "OPERATION_ADD",
+  "adjust_bid_valuation": {
+    "ids": {
+      "id": ["abcdef", "ghijkl"]
+    },
+    "value_factors": {
+      "value_factor": [0.123, 0.456]
+    }
   }
 }
 ```
