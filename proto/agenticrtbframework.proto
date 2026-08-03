@@ -1,6 +1,6 @@
 edition = "2023";
 
-package com.iabtechlab.bidstream.mutation.v1;
+package com.iabtechlab.bidstream.mutation.v2;
 
 // Import OpenRTB definitions for BidRequest and BidResponse
 import "com/iabtechlab/openrtb/v2.6/openrtb.proto";
@@ -30,6 +30,12 @@ message RTBRequest {
 
   // List of intents the server is eligibible to send back
   repeated Intent applicable_intents = 7;
+
+  // Object IDs for intent BID_VALUATION
+  oneof value {
+    // List of object Identifiers
+    IDsPayload object_ids = 100;
+  }
 
   // Extension fields
   Ext ext = 99;
@@ -101,6 +107,9 @@ message Mutation {
 
     // Content data
     DataPayload content_data = 104;
+
+    // Payload for bid valuation intent
+    AdjustBidValuationPayload adjust_bid_valuation = 105;
   }
 
   // Reserved for experimental/test payloads
@@ -142,6 +151,9 @@ enum Intent {
 
   // Add extended content IDs
   ADD_CIDS = 8;
+
+  // Adjust bid valuation with factors
+  ADJUST_BID_VALUATION = 9;
 
   // More intents can be added in the future
 
@@ -201,4 +213,11 @@ message MetricsPayload {
 message DataPayload {
   // List of data to add
   repeated com.iabtechlab.openrtb.v2.BidRequest.Data data = 1;
+}
+
+message AdjustBidValuationPayload {
+  // full set or subset of IDs from the RTBRequest payload that the specified bid adjustment value factors apply to
+  repeated string id = 1;
+  // Adjusted bid valuation factors, running in parallel with the contents of the id field
+  repeated float value_factor = 2;
 }
