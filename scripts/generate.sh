@@ -36,14 +36,22 @@ protoc \
   --go_opt=module=github.com/iabtechlab/agentic-rtb-framework \
   "$OPENRTB_PROTO"
 
-# Generate ARTF service and types
-echo "  - ARTF service and types..."
+# Generate ARTF types
+echo "  - ARTF types..."
+protoc \
+  --proto_path="$PROTO_DIR" \
+  --go_out="$PROJECT_ROOT" \
+  --go_opt=module=github.com/iabtechlab/agentic-rtb-framework \
+  "$PROTO_DIR/agenticrtbframework.proto"
+
+# Generate ARTF service (RTBExtensionPoint)
+echo "  - ARTF service..."
 protoc \
   --proto_path="$PROTO_DIR" \
   --go_out="$PROJECT_ROOT" \
   --go_opt=module=github.com/iabtechlab/agentic-rtb-framework \
   --go-grpc_out="$PROJECT_ROOT" \
   --go-grpc_opt=module=github.com/iabtechlab/agentic-rtb-framework \
-  "$PROTO_DIR/agenticrtbframework.proto"
+  "$PROTO_DIR/agenticrtbframeworkservices.proto"
 
 echo "Done! Generated files in $OUT_DIR"

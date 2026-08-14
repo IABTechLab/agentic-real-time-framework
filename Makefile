@@ -40,16 +40,7 @@ build-all: build build-rust
 # Protobuf targets
 
 bindings:
-	for x in ${LANGUAGES}; do \
-		protoc --proto_path=. \
-			--$${x}_out=. \
-			--experimental_editions \
-			openrtb.proto agenticrtbframework.proto; \
-		protoc --proto_path=. \
-			--$${x}_out=. \
-			--$${x}-grpc_out=require_unimplemented_servers=false:. \
-			agenticrtbframeworkservices.proto; \
-	done
+	scripts/generate.sh
 
 check:
 	prototool lint

@@ -2,8 +2,10 @@ edition = "2023";
 
 package com.iabtechlab.bidstream.mutation.v1;
 
+option go_package = "github.com/iabtechlab/agentic-rtb-framework/pkg/pb/artf";
+
 // Import OpenRTB definitions for BidRequest and BidResponse
-import "com/iabtechlab/openrtb/v2.6/openrtb.proto";
+import "com/iabtechlab/openrtb/v2/openrtb.proto";
 
 // ------------------- Messages -------------------
 
@@ -195,7 +197,7 @@ message AdjustBidPayload {
 
 message MetricsPayload {
   // List of metrics to add
-  repeated com.iabtechlab.openrtb.v2.BidRequest.Metric metric = 1;
+  repeated com.iabtechlab.openrtb.v2.BidRequest.Imp.Metric metric = 1;
 }
 
 message DataPayload {

@@ -218,7 +218,7 @@ Containers must include an `agent-manifest` label in image metadata with:
 
 The protobuf imports OpenRTB v2.6 definitions:
 ```protobuf
-import "com/iabtechlab/openrtb/v2.6/openrtb.proto";
+import "com/iabtechlab/openrtb/v2/openrtb.proto";
 ```
 
 You'll need the IAB Tech Lab OpenRTB protobuf definitions from:
