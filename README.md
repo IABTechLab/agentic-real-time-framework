@@ -7,16 +7,14 @@ https://iabtechlab.com/standards/artf/
 
 #### How to get started
 
-OpenRTB 2.6 protobufs are vendored at `proto/com/iabtechlab/openrtb/v2/openrtb.proto`. Generated Go is checked in under `pkg/pb/`. You do not need to download protos or run `protoc` to build.
+Download the openRTB official 2.6 Protocol Buffers specification from https://github.com/InteractiveAdvertisingBureau/openrtb2.x/blob/main/proto/src/main/com/iabtechlab/openrtb/v2/openrtb.proto to this directory.
 
-```bash
-make deps
-make build          # Go agent -> ./artf-agent
-make build-rust     # Rust reference service (optional)
-make test
-```
+From the command line:
 
-`make generate` / `make bindings` are optional. They confirm the vendored proto paths; they do not look for a repo-root `openrtb.proto`.
+1. Install `make` and the latest version of `protoc`.
+2. Open the `Makefile` and choose the language(s) for which the Protocol Buffers
+   object code should be generated.
+3. Run `make`.
 
 #### Contact
 For more information, or to get involved, please email support@iabtechlab.com.
@@ -54,11 +52,12 @@ This project implements a multi-protocol server that conforms to the ARTF specif
 - Go 1.23+ (required to build the Go agent)
 - Rust toolchain (optional, for `make build-rust`)
 - Docker (optional, for containerized deployment)
-- `protoc` v3.21+ and the Go plugins (optional, only if regenerating `pkg/pb/`)
+
+Checked-in generated Go in `pkg/pb/` is enough to `make build`. You do not need to download OpenRTB or run `protoc` to build the agent.
 
 #### Optional: regenerating protobuf code
 
-Checked-in generated Go in `pkg/pb/` is enough to build. The tools below are only needed for `./scripts/generate.sh`:
+`make generate` runs `scripts/generate.sh`. It is not required to build. The tools below are only needed for that regen:
 
 | Tool | Version | Installation |
 |------|---------|--------------|
@@ -94,7 +93,7 @@ make build-rust
 # Run with all services enabled
 make run-all
 
-# Run in development mode (same flags, after a local build)
+# Same as make run-all
 make run-dev
 ```
 

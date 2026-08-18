@@ -315,23 +315,22 @@ readinessProbe:
 
 ### Prerequisites
 
-- Go 1.22+
-- Protocol Buffers compiler (`protoc`)
-- protoc-gen-go and protoc-gen-go-grpc plugins
-- Docker (for containerized deployment)
+- Go 1.23+ (required to `make build`)
+- Protocol Buffers compiler (`protoc`) and Go plugins (optional: `make generate`)
+- Docker (optional, for containerized deployment)
 
 ### Build Commands
 
 | Command | Description |
 |---------|-------------|
 | `make deps` | Download Go dependencies |
-| `make generate` | Confirm vendored protos / checked-in `pkg/pb/` (does not require protoc) |
-| `make build` | Build the Go agent binary |
+| `make generate` | Regenerate protobuf Go via `scripts/generate.sh` (requires protoc; not required to `make build`) |
+| `make build` | Build the Go agent binary from checked-in `pkg/pb/` |
 | `make build-rust` | Build the Rust reference service (`rust/Cargo.toml`) |
 | `make test` | Run unit tests |
 | `make test-coverage` | Run tests with coverage report |
 | `make lint` | `go vet ./...` |
-| `make clean` | Remove build artifacts (`artf-agent`, `rust/target`, coverage files) |
+| `make clean` | Remove spec language output dirs, `artf-agent`, and coverage files |
 
 ### Run Commands
 
