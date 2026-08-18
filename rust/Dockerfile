@@ -33,7 +33,7 @@ RUN mkdir -p ${BASE_DIR}/proto
 
 COPY proto/*.proto ${BASE_DIR}/proto/
 COPY src/*.rs ./src/
-COPY cargo.toml ./Cargo.toml
+COPY Cargo.toml Cargo.lock ./
 
 RUN cargo install --path .
 RUN apt-get update && apt-get install -y protobuf-compiler

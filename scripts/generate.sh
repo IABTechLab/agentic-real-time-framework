@@ -12,13 +12,14 @@ PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
 PROTO_DIR="$PROJECT_ROOT/proto"
 OUT_DIR="$PROJECT_ROOT/pkg/pb"
 
-# OpenRTB proto location (downloaded by make fetch-openrtb)
+# Vendored OpenRTB 2.6 proto. The source import path says v2.6/; the file
+# lives under v2/. See issue #11. make fetch-openrtb verifies this path.
 OPENRTB_PROTO="$PROTO_DIR/com/iabtechlab/openrtb/v2/openrtb.proto"
 
 # Check if OpenRTB proto exists
 if [ ! -f "$OPENRTB_PROTO" ]; then
   echo "Error: OpenRTB proto not found at $OPENRTB_PROTO"
-  echo "Run 'make fetch-openrtb' to download it from IAB Tech Lab repository"
+  echo "It is vendored in this repository. Run 'make fetch-openrtb' to confirm."
   exit 1
 fi
 

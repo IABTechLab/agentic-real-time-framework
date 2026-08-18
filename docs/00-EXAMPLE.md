@@ -325,18 +325,20 @@ readinessProbe:
 | Command | Description |
 |---------|-------------|
 | `make deps` | Download Go dependencies |
-| `make generate` | Generate protobuf Go code |
-| `make build` | Build server binary |
+| `make generate` | Confirm vendored protos / checked-in `pkg/pb/` (does not require protoc) |
+| `make build` | Build the Go agent binary |
+| `make build-rust` | Build the Rust reference service (`rust/Cargo.toml`) |
 | `make test` | Run unit tests |
 | `make test-coverage` | Run tests with coverage report |
-| `make lint` | Run linter |
-| `make clean` | Remove build artifacts |
+| `make lint` | `go vet ./...` |
+| `make clean` | Remove build artifacts (`artf-agent`, `rust/target`, coverage files) |
 
 ### Run Commands
 
 | Command | Description |
 |---------|-------------|
-| `make run` | Run server locally |
+| `make run` | Run server locally (gRPC + MCP + web) |
+| `make run-all` | Same as `make run` |
 | `make docker-build` | Build Docker image |
 | `make docker-run` | Run Docker container |
 | `make docker-compose-up` | Start with docker-compose |
@@ -359,6 +361,7 @@ readinessProbe:
 |------|---------|-------------|
 | `-grpc-port` | 50051 | gRPC server listening port |
 | `-health-port` | 8080 | Health check HTTP server port |
+| `-health-check` | false | Probe local `/health/ready` and exit 0/1 (container HEALTHCHECK) |
 
 ### Environment Variables
 

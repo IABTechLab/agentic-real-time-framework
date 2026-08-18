@@ -7,14 +7,16 @@ https://iabtechlab.com/standards/artf/
 
 #### How to get started
 
-Download the openRTB official 2.6 Protocol Buffers specification from https://github.com/InteractiveAdvertisingBureau/openrtb2.x/blob/main/proto/src/main/com/iabtechlab/openrtb/v2/openrtb.proto to this directory.
+OpenRTB 2.6 protobufs are vendored at `proto/com/iabtechlab/openrtb/v2/openrtb.proto`. Generated Go is checked in under `pkg/pb/`. You do not need to download protos or run `protoc` to build.
 
-From the command line:
+```bash
+make deps
+make build          # Go agent -> ./artf-agent
+make build-rust     # Rust reference service (optional)
+make test
+```
 
-1. Install `make` and the latest version of `protoc`.
-2. Open the `Makefile` and choose the language(s) for which the Protocol Buffers
-   object code should be generated.
-3. Run `make`.
+`make generate` / `make bindings` are optional. They confirm the vendored proto paths; they do not look for a repo-root `openrtb.proto`.
 
 #### Contact
 For more information, or to get involved, please email support@iabtechlab.com.
@@ -49,13 +51,14 @@ This project implements a multi-protocol server that conforms to the ARTF specif
 
 #### Prerequisites
 
-- Go 1.23+
-- Protocol Buffers compiler (`protoc`) v3.21+
+- Go 1.23+ (required to build the Go agent)
+- Rust toolchain (optional, for `make build-rust`)
 - Docker (optional, for containerized deployment)
+- `protoc` v3.21+ and the Go plugins (optional, only if regenerating `pkg/pb/`)
 
-#### Critical Dependencies
+#### Optional: regenerating protobuf code
 
-The following tools must be installed to generate protobuf code:
+Checked-in generated Go in `pkg/pb/` is enough to build. The tools below are only needed for `./scripts/generate.sh`:
 
 | Tool | Version | Installation |
 |------|---------|--------------|
@@ -79,19 +82,19 @@ Go module dependencies (managed via `go.mod`):
 #### Build and Run
 
 ```bash
-# Install dependencies
+# Install Go module dependencies
 make deps
 
-# Generate protobuf code
-make generate
-
-# Build the server
+# Build the Go server (uses checked-in pkg/pb/; protoc not required)
 make build
+
+# Optional: build the Rust reference service
+make build-rust
 
 # Run with all services enabled
 make run-all
 
-# Run in development mode (verbose)
+# Run in development mode (same flags, after a local build)
 make run-dev
 ```
 
@@ -169,6 +172,7 @@ The MCP server exposes an `extend_rtb` tool that accepts OpenRTB bid requests an
 | `--mcp-port` | 50052 | MCP server port (ignored when both Web and MCP enabled) |
 | `--web-port` | 8081 | Web interface port |
 | `--health-port` | 8080 | Health check HTTP port |
+| `--health-check` | false | Probe `http://127.0.0.1:<health-port>/health/ready` and exit (Docker HEALTHCHECK) |
 
 #### Load Balancer Configuration
 
@@ -193,16 +197,13 @@ make test
 # Run with coverage
 make test-coverage
 
-# Test gRPC endpoint (requires grpcurl)
+# Test gRPC endpoint (requires a running agent and grpcurl)
 make grpc-test
 
-# Test MCP endpoint
-make mcp-test
-
-# Check health endpoints
+# Check health endpoints (requires a running agent)
 make health-check
 
-# Send sample requests via MCP
+# Send bundled samples over gRPC (requires a running agent and grpcurl)
 make sample-banner
 make sample-video
 make sample-bidshade
