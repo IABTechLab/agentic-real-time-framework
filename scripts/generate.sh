@@ -2,8 +2,8 @@
 # Generate Go code from protobuf definitions
 # Requires: protoc, protoc-gen-go, protoc-gen-go-grpc
 #
-# OpenRTB 2.6 proto is fetched from IAB Tech Lab repository:
-# https://github.com/IABTechLab/openrtb-proto-v2
+# OpenRTB 2.6 proto is vendored at proto/com/iabtechlab/openrtb/v2/openrtb.proto
+# (the source import path says v2.6/; the file lives under v2/).
 
 set -e
 
@@ -12,13 +12,12 @@ PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
 PROTO_DIR="$PROJECT_ROOT/proto"
 OUT_DIR="$PROJECT_ROOT/pkg/pb"
 
-# OpenRTB proto location (downloaded by make fetch-openrtb)
 OPENRTB_PROTO="$PROTO_DIR/com/iabtechlab/openrtb/v2/openrtb.proto"
 
 # Check if OpenRTB proto exists
 if [ ! -f "$OPENRTB_PROTO" ]; then
   echo "Error: OpenRTB proto not found at $OPENRTB_PROTO"
-  echo "Run 'make fetch-openrtb' to download it from IAB Tech Lab repository"
+  echo "It is vendored at proto/com/iabtechlab/openrtb/v2/openrtb.proto"
   exit 1
 fi
 

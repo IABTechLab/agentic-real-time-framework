@@ -315,28 +315,29 @@ readinessProbe:
 
 ### Prerequisites
 
-- Go 1.22+
-- Protocol Buffers compiler (`protoc`)
-- protoc-gen-go and protoc-gen-go-grpc plugins
-- Docker (for containerized deployment)
+- Go 1.23+ (required to `make build`)
+- Protocol Buffers compiler (`protoc`) and Go plugins (optional: `make generate`)
+- Docker (optional, for containerized deployment)
 
 ### Build Commands
 
 | Command | Description |
 |---------|-------------|
 | `make deps` | Download Go dependencies |
-| `make generate` | Generate protobuf Go code |
-| `make build` | Build server binary |
+| `make generate` | Regenerate protobuf Go via `scripts/generate.sh` (requires protoc; not required to `make build`) |
+| `make build` | Build the Go agent binary from checked-in `pkg/pb/` |
+| `make build-rust` | Build the Rust reference service (`rust/Cargo.toml`) |
 | `make test` | Run unit tests |
 | `make test-coverage` | Run tests with coverage report |
-| `make lint` | Run linter |
-| `make clean` | Remove build artifacts |
+| `make lint` | `go vet ./...` |
+| `make clean` | Remove spec language output dirs, `artf-agent`, and coverage files |
 
 ### Run Commands
 
 | Command | Description |
 |---------|-------------|
-| `make run` | Run server locally |
+| `make run` | Run server locally (gRPC + MCP + web) |
+| `make run-all` | Same as `make run` |
 | `make docker-build` | Build Docker image |
 | `make docker-run` | Run Docker container |
 | `make docker-compose-up` | Start with docker-compose |
@@ -359,6 +360,7 @@ readinessProbe:
 |------|---------|-------------|
 | `-grpc-port` | 50051 | gRPC server listening port |
 | `-health-port` | 8080 | Health check HTTP server port |
+| `-health-check` | false | Probe local `/health/ready` and exit 0/1 (container HEALTHCHECK) |
 
 ### Environment Variables
 

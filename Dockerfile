@@ -84,9 +84,9 @@ USER nobody
 # Expose ports (gRPC: 50051, Web/MCP: 8081, Health: 8080)
 EXPOSE 50051 8081 8080
 
-# Health check
+# Health check uses the same binary (the image has no curl/wget).
 HEALTHCHECK --interval=5s --timeout=3s --start-period=5s --retries=3 \
-    CMD ["/artf-agent", "-health-check"] || exit 1
+    CMD ["/artf-agent", "-health-check"]
 
 # Set entrypoint
 ENTRYPOINT ["/artf-agent"]

@@ -49,13 +49,15 @@ This project implements a multi-protocol server that conforms to the ARTF specif
 
 #### Prerequisites
 
-- Go 1.23+
-- Protocol Buffers compiler (`protoc`) v3.21+
+- Go 1.23+ (required to build the Go agent)
+- Rust toolchain (optional, for `make build-rust`)
 - Docker (optional, for containerized deployment)
 
-#### Critical Dependencies
+Checked-in generated Go in `pkg/pb/` is enough to `make build`. You do not need to download OpenRTB or run `protoc` to build the agent.
 
-The following tools must be installed to generate protobuf code:
+#### Optional: regenerating protobuf code
+
+`make generate` runs `scripts/generate.sh`. It is not required to build. The tools below are only needed for that regen:
 
 | Tool | Version | Installation |
 |------|---------|--------------|
@@ -79,19 +81,19 @@ Go module dependencies (managed via `go.mod`):
 #### Build and Run
 
 ```bash
-# Install dependencies
+# Install Go module dependencies
 make deps
 
-# Generate protobuf code
-make generate
-
-# Build the server
+# Build the Go server (uses checked-in pkg/pb/; protoc not required)
 make build
+
+# Optional: build the Rust reference service
+make build-rust
 
 # Run with all services enabled
 make run-all
 
-# Run in development mode (verbose)
+# Same as make run-all
 make run-dev
 ```
 
@@ -169,6 +171,7 @@ The MCP server exposes an `extend_rtb` tool that accepts OpenRTB bid requests an
 | `--mcp-port` | 50052 | MCP server port (ignored when both Web and MCP enabled) |
 | `--web-port` | 8081 | Web interface port |
 | `--health-port` | 8080 | Health check HTTP port |
+| `--health-check` | false | Probe `http://127.0.0.1:<health-port>/health/ready` and exit (Docker HEALTHCHECK) |
 
 #### Load Balancer Configuration
 
@@ -193,16 +196,13 @@ make test
 # Run with coverage
 make test-coverage
 
-# Test gRPC endpoint (requires grpcurl)
+# Test gRPC endpoint (requires a running agent and grpcurl)
 make grpc-test
 
-# Test MCP endpoint
-make mcp-test
-
-# Check health endpoints
+# Check health endpoints (requires a running agent)
 make health-check
 
-# Send sample requests via MCP
+# Send bundled samples over gRPC (requires a running agent and grpcurl)
 make sample-banner
 make sample-video
 make sample-bidshade

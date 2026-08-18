@@ -1,0 +1,12 @@
+# Local build artifacts. Without this, `docker build` sends rust/target
+# and ./artf-agent (hundreds of MB) as context.
+artf-agent
+artf-agent.exe
+rust/target
+coverage.out
+coverage.html
+.git
+.DS_Store
+*.log
+tmp/
+temp/
