@@ -79,20 +79,35 @@ Go module dependencies (managed via `go.mod`):
 #### Build and Run
 
 ```bash
-# Install dependencies
+# Download Go module dependencies
 make deps
 
-# Generate protobuf code
+# Generate protobuf code (requires protoc and plugins)
 make generate
 
 # Build the server
 make build
 
-# Run with all services enabled
+# Run with all services enabled (gRPC + MCP + Web UI)
 make run-all
 
-# Run in development mode (verbose)
-make run-dev
+# Run individual services
+make run-grpc    # gRPC only (port 50051)
+make run-mcp     # MCP only (port 50052)
+make run-web     # Web UI + MCP (port 8081)
+```
+
+#### Rust Implementation
+
+```bash
+# Build the Rust server
+make build-rust
+
+# Run the Rust server (gRPC on 50053, HTTP on 8082)
+make run-rust
+
+# Build both Go and Rust
+make build-all
 ```
 
 #### Docker Deployment
@@ -190,22 +205,15 @@ This configures the agent so that:
 # Run unit tests
 make test
 
-# Run with coverage
-make test-coverage
-
-# Test gRPC endpoint (requires grpcurl)
-make grpc-test
-
-# Test MCP endpoint
-make mcp-test
+# Test gRPC endpoint manually (requires grpcurl)
+grpcurl -plaintext localhost:50051 describe
+grpcurl -plaintext -d @ localhost:50051 \
+  com.iabtechlab.bidstream.mutation.services.v1.RTBExtensionPoint/GetMutations \
+  < samples/banner-basic.json
 
 # Check health endpoints
-make health-check
-
-# Send sample requests via MCP
-make sample-banner
-make sample-video
-make sample-bidshade
+curl http://localhost:8080/health/live
+curl http://localhost:8080/health/ready
 ```
 
 ### Security
