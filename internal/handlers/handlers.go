@@ -21,6 +21,7 @@ package handlers
 import (
 	"context"
 	"log"
+	"time"
 
 	pb "github.com/iabtechlab/agentic-rtb-framework/pkg/pb/artf"
 	openrtb "github.com/iabtechlab/agentic-rtb-framework/pkg/pb/openrtb"
@@ -211,7 +212,7 @@ func determineUserSegments(user *openrtb.BidRequest_User) []string {
 
 	// Example: Add demographic segments based on user attributes
 	if user.GetYob() > 0 {
-		age := 2024 - int(user.GetYob())
+		age := time.Now().Year() - int(user.GetYob())
 		if age >= 18 && age <= 24 {
 			segments = append(segments, "demo-18-24")
 		} else if age >= 25 && age <= 34 {
