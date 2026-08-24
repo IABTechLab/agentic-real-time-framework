@@ -41,11 +41,11 @@ build-all: build build-rust
 
 bindings:
 	for x in ${LANGUAGES}; do \
-		protoc --proto_path=. \
+		protoc --proto_path=proto \
 			--$${x}_out=. \
-			--experimental_editions \
-			openrtb.proto agenticrtbframework.proto; \
-		protoc --proto_path=. \
+			proto/com/iabtechlab/openrtb/v2/openrtb.proto \
+			proto/agenticrtbframework.proto; \
+		protoc --proto_path=proto --proto_path=. \
 			--$${x}_out=. \
 			--$${x}-grpc_out=require_unimplemented_servers=false:. \
 			agenticrtbframeworkservices.proto; \
