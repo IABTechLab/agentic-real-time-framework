@@ -160,27 +160,38 @@ func (a *Agent) handleExtendRTB(ctx context.Context, request mcp.CallToolRequest
 		bidResponseRaw = br
 	}
 
-	// Get optional lifecycle (NOTE: Full lifecycle enum requires proto regeneration)
+	// Get optional lifecycle
 	var lifecycleStr string
 	if lc, ok := args["lifecycle"].(string); ok && lc != "" {
 		lifecycleStr = lc
 	}
-	lifecycle := pb.Lifecycle_LIFECYCLE_UNSPECIFIED
+	lifecycle := parseLifecycle(lifecycleStr)
 
-	// Get optional originator (NOTE: Originator type requires proto regeneration)
+	// Get optional originator
+	var originator *pb.Originator
 	var originatorStr string
 	if orig, ok := args["originator"].(map[string]interface{}); ok {
+		originator = &pb.Originator{}
 		if t, ok := orig["type"].(string); ok {
 			originatorStr = t
+			originatorType := parseOriginatorType(t)
+			originator.Type = originatorType.Enum()
+		}
+		if id, ok := orig["id"].(string); ok {
+			originator.Id = &id
 		}
 	}
 
 	// Get optional applicable_intents
 	var applicableIntentStrs []string
+	var applicableIntents []pb.Intent
 	if intentsRaw, ok := args["applicable_intents"].([]interface{}); ok {
 		for _, intentRaw := range intentsRaw {
 			if intentStr, ok := intentRaw.(string); ok {
 				applicableIntentStrs = append(applicableIntentStrs, intentStr)
+				if parsed := parseIntent(intentStr); parsed != pb.Intent_INTENT_UNSPECIFIED {
+					applicableIntents = append(applicableIntents, parsed)
+				}
 			}
 		}
 	}
@@ -203,13 +214,14 @@ func (a *Agent) handleExtendRTB(ctx context.Context, request mcp.CallToolRequest
 	}
 
 	// Build the gRPC request
-	// NOTE: applicable_intents, originator, and full lifecycle enum require proto regeneration.
 	grpcRequest := &pb.RTBRequest{
-		Id:          &id,
-		Tmax:        &tmax,
-		Lifecycle:   lifecycle.Enum(),
-		BidRequest:  bidRequest,
-		BidResponse: bidResponse,
+		Id:                &id,
+		Tmax:              &tmax,
+		Lifecycle:         lifecycle.Enum(),
+		BidRequest:        bidRequest,
+		BidResponse:       bidResponse,
+		Originator:        originator,
+		ApplicableIntents: applicableIntents,
 	}
 
 	// Call the gRPC agent directly (no network hop)
@@ -317,8 +329,6 @@ func (a *Agent) handleListFederatedEndpoints(ctx context.Context, request mcp.Ca
 }
 
 // parseIntent converts a string to pb.Intent
-// NOTE: After proto regeneration, add parseLifecycle, parseOriginatorType functions
-// and ADD_CIDS case to this switch
 func parseIntent(s string) pb.Intent {
 	switch s {
 	case "ACTIVATE_SEGMENTS":
@@ -335,9 +345,38 @@ func parseIntent(s string) pb.Intent {
 		return pb.Intent_BID_SHADE
 	case "ADD_METRICS":
 		return pb.Intent_ADD_METRICS
-	// case "ADD_CIDS": return pb.Intent_ADD_CIDS // Requires proto regeneration
+	case "ADD_CIDS":
+		return pb.Intent_ADD_CIDS
 	default:
 		return pb.Intent_INTENT_UNSPECIFIED
+	}
+}
+
+// parseLifecycle converts a string to pb.Lifecycle
+func parseLifecycle(s string) pb.Lifecycle {
+	switch s {
+	case "LIFECYCLE_PUBLISHER_BID_REQUEST":
+		return pb.Lifecycle_LIFECYCLE_PUBLISHER_BID_REQUEST
+	case "LIFECYCLE_DSP_BID_RESPONSE":
+		return pb.Lifecycle_LIFECYCLE_DSP_BID_RESPONSE
+	default:
+		return pb.Lifecycle_LIFECYCLE_UNSPECIFIED
+	}
+}
+
+// parseOriginatorType converts a string to pb.Originator_Type
+func parseOriginatorType(s string) pb.Originator_Type {
+	switch s {
+	case "TYPE_PUBLISHER":
+		return pb.Originator_TYPE_PUBLISHER
+	case "TYPE_SSP":
+		return pb.Originator_TYPE_SSP
+	case "TYPE_EXCHANGE":
+		return pb.Originator_TYPE_EXCHANGE
+	case "TYPE_DSP":
+		return pb.Originator_TYPE_DSP
+	default:
+		return pb.Originator_TYPE_UNSPECIFIED
 	}
 }
 
