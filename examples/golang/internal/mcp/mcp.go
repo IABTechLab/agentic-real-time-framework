@@ -28,8 +28,8 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/iabtechlab/agentic-rtb-framework/internal/agent"
-	"github.com/iabtechlab/agentic-rtb-framework/internal/federation"
+	"github.com/iabtechlab/agentic-rtb-framework/examples/golang/internal/agent"
+	"github.com/iabtechlab/agentic-rtb-framework/examples/golang/internal/federation"
 	pb "github.com/iabtechlab/agentic-rtb-framework/pkg/pb/artf"
 	openrtb "github.com/iabtechlab/agentic-rtb-framework/pkg/pb/openrtb"
 	"github.com/mark3labs/mcp-go/mcp"

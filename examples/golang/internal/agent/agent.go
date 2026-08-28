@@ -23,7 +23,7 @@ import (
 	"log"
 	"time"
 
-	"github.com/iabtechlab/agentic-rtb-framework/internal/handlers"
+	"github.com/iabtechlab/agentic-rtb-framework/examples/golang/internal/handlers"
 	pb "github.com/iabtechlab/agentic-rtb-framework/pkg/pb/artf"
 	"google.golang.org/grpc"
 )

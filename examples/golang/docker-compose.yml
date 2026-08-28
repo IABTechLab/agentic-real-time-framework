@@ -3,8 +3,8 @@ version: '3.8'
 services:
   artf-agent:
     build:
-      context: .
-      dockerfile: Dockerfile
+      context: ../..
+      dockerfile: examples/golang/Dockerfile
     ports:
       - "50051:50051"  # gRPC
       - "50052:50052"  # MCP
@@ -50,8 +50,8 @@ services:
   # gRPC-only service variant
   artf-grpc:
     build:
-      context: .
-      dockerfile: Dockerfile
+      context: ../..
+      dockerfile: examples/golang/Dockerfile
     profiles: ["grpc-only"]
     ports:
       - "50051:50051"
@@ -76,8 +76,8 @@ services:
   # MCP-only service variant
   artf-mcp:
     build:
-      context: .
-      dockerfile: Dockerfile
+      context: ../..
+      dockerfile: examples/golang/Dockerfile
     profiles: ["mcp-only"]
     ports:
       - "50052:50052"
