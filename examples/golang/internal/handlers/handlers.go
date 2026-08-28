@@ -269,7 +269,7 @@ func calculateDealFloorAdjustment(imp *openrtb.BidRequest_Imp) *pb.AdjustDealPay
 }
 
 // calculateShadedBidPrice calculates the optimal shaded bid price
-func calculateShadedBidPrice(req *openrtb.BidRequest, bid *openrtb.BidResponse_SeatBid_Bid) *float64 {
+func calculateShadedBidPrice(req *openrtb.BidRequest, bid *openrtb.BidResponse_Bid) *float64 {
 	originalPrice := bid.GetPrice()
 	if originalPrice <= 0 {
 		return nil

@@ -32,12 +32,12 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/iabtechlab/agentic-rtb-framework/internal/agent"
-	"github.com/iabtechlab/agentic-rtb-framework/internal/federation"
-	"github.com/iabtechlab/agentic-rtb-framework/internal/handlers"
-	"github.com/iabtechlab/agentic-rtb-framework/internal/health"
-	"github.com/iabtechlab/agentic-rtb-framework/internal/mcp"
-	"github.com/iabtechlab/agentic-rtb-framework/internal/web"
+	"github.com/iabtechlab/agentic-rtb-framework/examples/golang/internal/agent"
+	"github.com/iabtechlab/agentic-rtb-framework/examples/golang/internal/federation"
+	"github.com/iabtechlab/agentic-rtb-framework/examples/golang/internal/handlers"
+	"github.com/iabtechlab/agentic-rtb-framework/examples/golang/internal/health"
+	"github.com/iabtechlab/agentic-rtb-framework/examples/golang/internal/mcp"
+	"github.com/iabtechlab/agentic-rtb-framework/examples/golang/internal/web"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 )
