@@ -199,9 +199,14 @@ message AdjustBidPayload {
 Used for bid valuation responses.
 
 ```protobuf
+message BidValuationResult {
+  string id = 1;           // Object ID from the RTBRequest payload that the bid valuation applies to
+  float value_factor = 2;  // Adjusted bid valuation factor contributing to perceived bid request value
+}
+
 message AdjustBidValuationPayload {
-  repeated string id = 1;
-  repeated float value_factor = 2;
+  // List of bid valuation results pertaining to the object IDs originally passed via the RTBRequest payload
+  repeated BidValuationResult results = 1;
 }
 ```
 
@@ -232,7 +237,7 @@ message AddMetricsPayload {
 | 6 | `BID_SHADE` | Adjust the bid price of a specific bid |
 | 7 | `ADD_METRICS` | Add metrics to an impression |
 | 8 | `ADD_CIDS` | Add content IDs to an impression |
-| 9 | `BID_VALUATION` | Adjust the perceived values of potential bids |
+| 9 | `BID_VALUATION` | Adjust perceived value based on sideband information (e.g. ad groups, campaigns, contextual data) made available to the agent by the orchestrator or via outside sources |
 
 ### Operation Enum
 
@@ -253,7 +258,7 @@ message AddMetricsPayload {
 | `ADJUST_DEAL_FLOOR` | AdjustDealPayload | `/imp/{id}/pmp/deals/{dealId}` |
 | `ADJUST_DEAL_MARGIN` | AdjustDealPayload | `/imp/{id}/pmp/deals/{dealId}` |
 | `BID_SHADE` | AdjustBidPayload | `/seatbid/{seat}/bid/{bidId}` |
-| `BID_VALUATION` | AdjustBidValuationPayload |  |
+| `BID_VALUATION` | AdjustBidValuationPayload | `/imp/{id}` |
 | `ADD_METRICS` | AddMetricsPayload | `/imp/{id}/metric` |
 
 ---
@@ -401,7 +406,8 @@ The container image must include an `agent-manifest` label with JSON metadata:
     "ACTIVATE_DEALS",
     "SUPPRESS_DEALS",
     "ADJUST_DEAL_FLOOR",
-    "BID_SHADE"
+    "BID_SHADE",
+    "BID_VALUATION"
   ],
   "dependencies": {},
   "health": {
@@ -479,15 +485,27 @@ The container image must include an `agent-manifest` label with JSON metadata:
 
 ```json
 {
-  "intent": "BID_VALUATION",
+  "intent": "ADJUST_BID_VALUATION",
   "op": "OPERATION_ADD",
   "adjust_bid_valuation": {
-    "ids": {
-      "id": ["abcdef", "ghijkl"]
-    },
-    "value_factors": {
-      "value_factor": [0.123, 0.456]
-    }
+    "results": [
+      {
+        "id": "1234",
+        "value_factor": 1
+      },
+      {
+        "id": "4321",
+        "value_factor": 0.6
+      },
+      {
+        "id": "10101",
+        "value_factor": 0.75
+      },
+      {
+        "id": "20202",
+        "value_factor": 1
+      }
+    ]
   }
 }
 ```
@@ -504,5 +522,5 @@ The container image must include an `agent-manifest` label with JSON metadata:
 
 ---
 
-*Document Version: 1.0.0*
-*Last Updated: November 2025*
+*Document Version: 1.1.0*
+*Last Updated: September 2026*

@@ -33,12 +33,12 @@ message RTBRequest {
 
   // Object IDs for intent BID_VALUATION
   oneof value {
-    // List of object Identifiers
+    // List of object identifiers referencing "sideband" information
     IDsPayload object_ids = 100;
   }
 
   // Extension fields
-  Ext ext = 99;
+  Ext ext = 199;
 
   message Ext {
     extensions 500 to max;
@@ -108,7 +108,7 @@ message Mutation {
     // Content data
     DataPayload content_data = 104;
 
-    // Payload for bid valuation intent
+    // Payload for bid valuation
     AdjustBidValuationPayload adjust_bid_valuation = 105;
   }
 
@@ -215,9 +215,14 @@ message DataPayload {
   repeated com.iabtechlab.openrtb.v2.BidRequest.Data data = 1;
 }
 
+message BidValuationResult {
+  // Object ID from the RTBRequest payload that the bid valuation applies to
+  string id = 1;
+  // Adjusted bid valuation factor
+  float value_factor = 2;
+}
+
 message AdjustBidValuationPayload {
-  // full set or subset of IDs from the RTBRequest payload that the specified bid adjustment value factors apply to
-  repeated string id = 1;
-  // Adjusted bid valuation factors, running in parallel with the contents of the id field
-  repeated float value_factor = 2;
+  // List of bid valuation results pertaining to the object IDs originally passed via the RTBRequest payload
+  repeated BidValuationResult results = 1;
 }
