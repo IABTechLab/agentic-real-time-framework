@@ -43,13 +43,14 @@ The Agentic RTB Framework (ARTF) defines a standard for implementing agent servi
 ### Service Definition
 
 ```protobuf
-syntax = "proto2";
-package com.iabtechlab.bidstream.mutation.v1;
+edition = "2023";
+package com.iabtechlab.bidstream.mutation.services.v1;
+
+import "agenticrtbframework.proto";
 
 service RTBExtensionPoint {
-  // GetMutations returns RTBResponse containing mutations to be applied
-  // at the predetermined auction lifecycle event
-  rpc GetMutations (RTBRequest) returns (RTBResponse);
+  // GetMutations returns RTBResponse containing mutations to be applied at the predetermined auction lifecycle event
+  rpc GetMutations (com.iabtechlab.bidstream.mutation.v1.RTBRequest) returns (com.iabtechlab.bidstream.mutation.v1.RTBResponse);
 }
 ```
 
@@ -58,7 +59,7 @@ service RTBExtensionPoint {
 | Attribute | Value |
 |-----------|-------|
 | Protocol | gRPC over HTTP/2 |
-| Serialization | Protocol Buffers (proto2) |
+| Serialization | Protocol Buffers (proto3) |
 | Default Port | 50051 |
 | TLS | Recommended for production |
 
@@ -114,7 +115,27 @@ The request message sent from the orchestrator to the agent.
 | `tmax` | int32 | Yes | Maximum response time in milliseconds |
 | `bid_request` | BidRequest | Yes | OpenRTB v2.6 bid request |
 | `bid_response` | BidResponse | No | OpenRTB v2.6 bid response (if available) |
+| `originator` | Originator | No | Business entity that created the request or response |
+| `applicable_intents` | Intent[] | No | Intents the server is eligible to return |
 | `ext` | Extensions | No | Extension fields |
+
+### Lifecycle
+
+| Value | Name | Description |
+|-------|------|-------------|
+| 0 | `LIFECYCLE_UNSPECIFIED` | Unspecified |
+| 1 | `LIFECYCLE_PUBLISHER_BID_REQUEST` | Publisher bid request stage |
+| 2 | `LIFECYCLE_DSP_BID_RESPONSE` | DSP bid response stage |
+
+### Originator
+
+| Value | Name | Description |
+|-------|------|-------------|
+| 0 | `TYPE_UNSPECIFIED` | Unspecified |
+| 1 | `TYPE_PUBLISHER` | Publisher |
+| 2 | `TYPE_SSP` | SSP |
+| 3 | `TYPE_EXCHANGE` | Exchange |
+| 4 | `TYPE_DSP` | DSP |
 
 ### RTBResponse
 
@@ -168,13 +189,13 @@ Used for deal floor and margin adjustments.
 
 ```protobuf
 message AdjustDealPayload {
-  optional double bidfloor = 1;
-  optional Margin margin = 2;
+  double bidfloor = 1;
+  Margin margin = 2;
 }
 
 message Margin {
-  optional double value = 1;
-  optional CalculationType calculation_type = 2;
+  double value = 1;
+  CalculationType calculation_type = 2;
 
   enum CalculationType {
     CPM = 0;      // Absolute margin
@@ -189,17 +210,27 @@ Used for bid price adjustments.
 
 ```protobuf
 message AdjustBidPayload {
-  optional double price = 1;
+  double price = 1;
 }
 ```
 
-#### AddMetricsPayload
+#### MetricsPayload
 
 Used for adding impression metrics.
 
 ```protobuf
-message AddMetricsPayload {
-  repeated Metric metric = 1;  // OpenRTB Metric objects
+message MetricsPayload {
+  repeated com.iabtechlab.openrtb.v2.BidRequest.Metric metric = 1;
+}
+```
+
+#### DataPayload
+
+Used for adding content data, including content IDs in `data.ext.cids`.
+
+```protobuf
+message DataPayload {
+  repeated com.iabtechlab.openrtb.v2.BidRequest.Data data = 1;
 }
 ```
 
@@ -209,16 +240,17 @@ message AddMetricsPayload {
 
 ### Intent Enum
 
-| Value | Name | Description |
-|-------|------|-------------|
-| 0 | `INTENT_UNSPECIFIED` | Unspecified (invalid) |
-| 1 | `ACTIVATE_SEGMENTS` | Activate user segments by external segment IDs |
-| 2 | `ACTIVATE_DEALS` | Activate deals by external deal IDs |
-| 3 | `SUPPRESS_DEALS` | Suppress deals by external deal IDs |
-| 4 | `ADJUST_DEAL_FLOOR` | Adjust the bid floor of a specific deal |
-| 5 | `ADJUST_DEAL_MARGIN` | Adjust the deal margin of a specific deal |
-| 6 | `BID_SHADE` | Adjust the bid price of a specific bid |
-| 7 | `ADD_METRICS` | Add metrics to an impression |
+| Value | Name                 | Description                                    |
+|-------|----------------------|------------------------------------------------|
+| 0     | `INTENT_UNSPECIFIED` | Unspecified (invalid)                          |
+| 1     | `ACTIVATE_SEGMENTS`  | Activate user segments by external segment IDs |
+| 2     | `ACTIVATE_DEALS`     | Activate deals by external deal IDs            |
+| 3     | `SUPPRESS_DEALS`     | Suppress deals by external deal IDs            |
+| 4     | `ADJUST_DEAL_FLOOR`  | Adjust the bid floor of a specific deal        |
+| 5     | `ADJUST_DEAL_MARGIN` | Adjust the deal margin of a specific deal      |
+| 6     | `BID_SHADE`          | Adjust the bid price of a specific bid         |
+| 7     | `ADD_METRICS`        | Add metrics to an impression                   |
+| 8     | `ADD_CIDS`           | Add extended content IDs                       |
 
 ### Operation Enum
 
@@ -231,15 +263,18 @@ message AddMetricsPayload {
 
 ### Intent-Payload Mapping
 
-| Intent | Expected Payload | Path Example |
-|--------|-----------------|--------------|
-| `ACTIVATE_SEGMENTS` | IDsPayload | `/user/data/segment` |
-| `ACTIVATE_DEALS` | IDsPayload | `/imp/{id}` |
-| `SUPPRESS_DEALS` | IDsPayload | `/imp/{id}` |
-| `ADJUST_DEAL_FLOOR` | AdjustDealPayload | `/imp/{id}/pmp/deals/{dealId}` |
-| `ADJUST_DEAL_MARGIN` | AdjustDealPayload | `/imp/{id}/pmp/deals/{dealId}` |
-| `BID_SHADE` | AdjustBidPayload | `/seatbid/{seat}/bid/{bidId}` |
-| `ADD_METRICS` | AddMetricsPayload | `/imp/{id}/metric` |
+| Intent               | Expected Payload  | Path Example                  |
+|----------------------|-------------------|-------------------------------|
+| `ACTIVATE_SEGMENTS`  | IDsPayload        | `/user/data/segment`          |
+| `ACTIVATE_DEALS`     | IDsPayload        | `/imp/{id}`                   |
+| `SUPPRESS_DEALS`     | IDsPayload        | `/imp/{id}`                   |
+| `ADJUST_DEAL_FLOOR`  | AdjustDealPayload | `/imp/{id}/deals/{dealId}`    |
+| `ADJUST_DEAL_MARGIN` | AdjustDealPayload | `/imp/{id}/deals/{dealId}`    |
+| `BID_SHADE`          | AdjustBidPayload  | `/seatbid/{seat}/bid/{bidId}` |
+| `ADD_METRICS`        | MetricsPayload    | `/imp/{id}`                   |
+| `ADD_CIDS`           | DataPayload       | `/site/content/data` (`data.ext.cids`) |
+
+Detailed guides for each intent live in `docs/intents/`.
 
 ---
 
