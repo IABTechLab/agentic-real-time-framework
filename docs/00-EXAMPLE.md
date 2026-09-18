@@ -27,6 +27,7 @@ The Agentic RTB Framework (ARTF) defines a standard for implementing agent servi
 - **Deal Management** - Activate, suppress, and adjust deals dynamically
 - **Bid Shading** - Optimize bid prices using intelligent pricing strategies
 - **Metrics Addition** - Add viewability and other metrics to impressions
+- **Data Segment Embeddings** - Attach Agentic Audiences data segments (optionally with embeddings) to the bid request
 
 ### Key Principles
 
@@ -234,6 +235,36 @@ message DataPayload {
 }
 ```
 
+#### DataSegmentsPayload
+
+Used for Agentic Audiences data segments, optionally carrying embeddings in `segment[].ext.aa`.
+
+```protobuf
+message DataSegmentsPayload {
+  repeated EmbeddingData data = 1;
+}
+
+message EmbeddingData {
+  string name = 1;                      // Data.name = provider identifier
+  string id = 2;                        // Data.id (OPTIONAL)
+  repeated EmbeddingSegment segment = 3;
+}
+
+message EmbeddingSegment {
+  string id = 1;
+  string name = 2;
+  AaEnvelope aa = 3;                    // segment[].ext.aa (OPTIONAL)
+}
+
+message AaEnvelope {
+  string ver = 1;
+  string vector = 2;                    // base64 Float32 LE (RFC 4648)
+  uint32 dimension = 3;
+  string model = 4;
+  repeated uint32 type = 5;             // 1=identity, 2=contextual, 3=reinforcement
+}
+```
+
 ---
 
 ## Intents and Operations
@@ -251,6 +282,7 @@ message DataPayload {
 | 6     | `BID_SHADE`          | Adjust the bid price of a specific bid         |
 | 7     | `ADD_METRICS`        | Add metrics to an impression                   |
 | 8     | `ADD_CIDS`           | Add extended content IDs                       |
+| 9     | `ADD_DATA_SEGMENT_WITH_EMBEDDINGS` | Add Agentic Audiences data segment(s) to the BidRequest, optionally with embeddings |
 
 ### Operation Enum
 
@@ -273,6 +305,7 @@ message DataPayload {
 | `BID_SHADE`          | AdjustBidPayload  | `/seatbid/{seat}/bid/{bidId}` |
 | `ADD_METRICS`        | MetricsPayload    | `/imp/{id}`                   |
 | `ADD_CIDS`           | DataPayload       | `/site/content/data` (`data.ext.cids`) |
+| `ADD_DATA_SEGMENT_WITH_EMBEDDINGS` | DataSegmentsPayload | `/user/data` |
 
 Detailed guides for each intent live in `docs/intents/`.
 
@@ -421,7 +454,8 @@ The container image must include an `agent-manifest` label with JSON metadata:
     "ACTIVATE_DEALS",
     "SUPPRESS_DEALS",
     "ADJUST_DEAL_FLOOR",
-    "BID_SHADE"
+    "BID_SHADE",
+    "ADD_DATA_SEGMENT_WITH_EMBEDDINGS"
   ],
   "dependencies": {},
   "health": {
@@ -495,17 +529,48 @@ The container image must include an `agent-manifest` label with JSON metadata:
 }
 ```
 
+### Add Data Segment With Embeddings
+
+```json
+{
+  "intent": "ADD_DATA_SEGMENT_WITH_EMBEDDINGS",
+  "op": "OPERATION_ADD",
+  "path": "/user/data",
+  "data_segments": {
+    "data": [
+      {
+        "name": "data-provider",
+        "segment": [
+          {
+            "id": "seg-ctx-001",
+            "name": "descriptive-name",
+            "aa": {
+              "ver": "1.0.0",
+              "vector": "mpkZPq5HYb5SuJ4+PQrXPo/C9T7NzEy97FE4Pilcj74=",
+              "dimension": 8,
+              "model": "sbert-mini-ctx-001",
+              "type": [2]
+            }
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
 ---
 
 ## References
 
 - [IAB Tech Lab Agentic RTB Framework v1.0](https://iabtechlab.com/standards/artf/)
 - [OpenRTB v2.6 Specification](https://iabtechlab.com/standards/openrtb/)
+- [IAB OpenRTB Agentic Audiences community extension](https://github.com/InteractiveAdvertisingBureau/openrtb/blob/main/extensions/community_extensions/agentic-audiences.md)
 - [gRPC Documentation](https://grpc.io/docs/)
 - [Protocol Buffers](https://protobuf.dev/)
 - [OCI Container Specification](https://opencontainers.org/)
 
 ---
 
-*Document Version: 1.0.0*
-*Last Updated: November 2025*
+*Document Version: 1.1.0*
+*Last Updated: September 2026*
