@@ -99,11 +99,9 @@ message Mutation {
     // Metrics or telemetry data
     MetricsPayload metrics = 103;
 
-    // Content data
+    // Content data (also used by ADD_DATA_SEGMENT_WITH_EMBEDDINGS;
+    // each segment must include ext.aa — see OpenRTB Segment.ext.aa)
     DataPayload content_data = 104;
-
-    // Agentic Audiences data segment(s), optionally with embeddings
-    DataSegmentsPayload data_segments = 105;
   }
 
   // Reserved for experimental/test payloads
@@ -146,7 +144,8 @@ enum Intent {
   // Add extended content IDs
   ADD_CIDS = 8;
 
-  // Add Agentic Audiences data segment(s) to the BidRequest
+  // Add Agentic Audiences data segment(s) with required embeddings to the BidRequest
+  // Uses DataPayload (content_data); each segment must include ext.aa
   ADD_DATA_SEGMENT_WITH_EMBEDDINGS = 9;
 
   // More intents can be added in the future
@@ -207,53 +206,4 @@ message MetricsPayload {
 message DataPayload {
   // List of data to add
   repeated com.iabtechlab.openrtb.v2.BidRequest.Data data = 1;
-}
-
-// DataSegmentsPayload carries OpenRTB Data objects that may include Agentic
-// Audiences embeddings (segment[].ext.aa). Maps onto BidRequest.user.data[].
-message DataSegmentsPayload {
-  // OpenRTB Data[] at Mutation.path (typically /user/data)
-  repeated EmbeddingData data = 1;
-}
-
-// EmbeddingData models an OpenRTB Data object used as an Agentic Audiences carrier.
-message EmbeddingData {
-  // Data.name = provider identifier
-  string name = 1;
-
-  // Data.id (OPTIONAL)
-  string id = 2;
-
-  repeated EmbeddingSegment segment = 3;
-}
-
-// EmbeddingSegment models an OpenRTB Segment object, optionally with aa envelope.
-message EmbeddingSegment {
-  // segment[].id
-  string id = 1;
-
-  // segment[].name
-  string name = 2;
-
-  // segment[].ext.aa (OPTIONAL) — Agentic Audiences community extension
-  AaEnvelope aa = 3;
-}
-
-// AaEnvelope models segment[].ext.aa from the IAB OpenRTB Agentic Audiences
-// community extension (ver, vector, dimension, model, type).
-message AaEnvelope {
-  // Embedding schema/spec version, e.g. "1.0.0"
-  string ver = 1;
-
-  // Base64-encoded Float32 little-endian vector (RFC 4648)
-  string vector = 2;
-
-  // Number of Float32 values (decoded byte length / 4)
-  uint32 dimension = 3;
-
-  // Producing model identifier, e.g. "sbert-mini-ctx-001"
-  string model = 4;
-
-  // Signal type codes: 1=identity, 2=contextual, 3=reinforcement
-  repeated uint32 type = 5;
 }

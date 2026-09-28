@@ -27,7 +27,7 @@ The Agentic RTB Framework (ARTF) defines a standard for implementing agent servi
 - **Deal Management** - Activate, suppress, and adjust deals dynamically
 - **Bid Shading** - Optimize bid prices using intelligent pricing strategies
 - **Metrics Addition** - Add viewability and other metrics to impressions
-- **Data Segment Embeddings** - Attach Agentic Audiences data segments (optionally with embeddings) to the bid request
+- **Data Segment Embeddings** - Attach Agentic Audiences data segments with required embeddings to the bid request
 
 ### Key Principles
 
@@ -227,7 +227,9 @@ message MetricsPayload {
 
 #### DataPayload
 
-Used for adding content data, including content IDs in `data.ext.cids`.
+Used for content data (`ADD_CIDS`) and for Agentic Audiences segments with embeddings (`ADD_DATA_SEGMENT_WITH_EMBEDDINGS`) via the `content_data` field.
+
+For `ADD_DATA_SEGMENT_WITH_EMBEDDINGS`, each `data.segment` **must** include `ext.aa` (OpenRTB Agentic Audiences envelope; see [openrtb2.x#188](https://github.com/InteractiveAdvertisingBureau/openrtb2.x/pull/188)).
 
 ```protobuf
 message DataPayload {
@@ -235,35 +237,7 @@ message DataPayload {
 }
 ```
 
-#### DataSegmentsPayload
-
-Used for Agentic Audiences data segments, optionally carrying embeddings in `segment[].ext.aa`.
-
-```protobuf
-message DataSegmentsPayload {
-  repeated EmbeddingData data = 1;
-}
-
-message EmbeddingData {
-  string name = 1;                      // Data.name = provider identifier
-  string id = 2;                        // Data.id (OPTIONAL)
-  repeated EmbeddingSegment segment = 3;
-}
-
-message EmbeddingSegment {
-  string id = 1;
-  string name = 2;
-  AaEnvelope aa = 3;                    // segment[].ext.aa (OPTIONAL)
-}
-
-message AaEnvelope {
-  string ver = 1;
-  string vector = 2;                    // base64 Float32 LE (RFC 4648)
-  uint32 dimension = 3;
-  string model = 4;
-  repeated uint32 type = 5;             // 1=identity, 2=contextual, 3=reinforcement
-}
-```
+See [docs/intents/ADD_DATA_SEGMENT_WITH_EMBEDDINGS.md](intents/ADD_DATA_SEGMENT_WITH_EMBEDDINGS.md) for intent-specific usage.
 
 ---
 
@@ -282,7 +256,7 @@ message AaEnvelope {
 | 6     | `BID_SHADE`          | Adjust the bid price of a specific bid         |
 | 7     | `ADD_METRICS`        | Add metrics to an impression                   |
 | 8     | `ADD_CIDS`           | Add extended content IDs                       |
-| 9     | `ADD_DATA_SEGMENT_WITH_EMBEDDINGS` | Add Agentic Audiences data segment(s) to the BidRequest, optionally with embeddings |
+| 9     | `ADD_DATA_SEGMENT_WITH_EMBEDDINGS` | Add Agentic Audiences data segment(s) with required embeddings to the BidRequest |
 
 ### Operation Enum
 
@@ -305,7 +279,7 @@ message AaEnvelope {
 | `BID_SHADE`          | AdjustBidPayload  | `/seatbid/{seat}/bid/{bidId}` |
 | `ADD_METRICS`        | MetricsPayload    | `/imp/{id}`                   |
 | `ADD_CIDS`           | DataPayload       | `/site/content/data` (`data.ext.cids`) |
-| `ADD_DATA_SEGMENT_WITH_EMBEDDINGS` | DataSegmentsPayload | `/user/data` |
+| `ADD_DATA_SEGMENT_WITH_EMBEDDINGS` | DataPayload (`content_data`) | `/user/data` |
 
 Detailed guides for each intent live in `docs/intents/`.
 
@@ -536,7 +510,7 @@ The container image must include an `agent-manifest` label with JSON metadata:
   "intent": "ADD_DATA_SEGMENT_WITH_EMBEDDINGS",
   "op": "OPERATION_ADD",
   "path": "/user/data",
-  "data_segments": {
+  "content_data": {
     "data": [
       {
         "name": "data-provider",
@@ -544,12 +518,14 @@ The container image must include an `agent-manifest` label with JSON metadata:
           {
             "id": "seg-ctx-001",
             "name": "descriptive-name",
-            "aa": {
-              "ver": "1.0.0",
-              "vector": "mpkZPq5HYb5SuJ4+PQrXPo/C9T7NzEy97FE4Pilcj74=",
-              "dimension": 8,
-              "model": "sbert-mini-ctx-001",
-              "type": [2]
+            "ext": {
+              "aa": {
+                "ver": "1.0.0",
+                "vector": "mpkZPq5HYb5SuJ4+PQrXPo/C9T7NzEy97FE4Pilcj74=",
+                "dimension": 8,
+                "model": "sbert-mini-ctx-001",
+                "type": [2]
+              }
             }
           }
         ]
@@ -566,6 +542,7 @@ The container image must include an `agent-manifest` label with JSON metadata:
 - [IAB Tech Lab Agentic RTB Framework v1.0](https://iabtechlab.com/standards/artf/)
 - [OpenRTB v2.6 Specification](https://iabtechlab.com/standards/openrtb/)
 - [IAB OpenRTB Agentic Audiences community extension](https://github.com/InteractiveAdvertisingBureau/openrtb/blob/main/extensions/community_extensions/agentic-audiences.md)
+- [OpenRTB protobuf `Segment.ext.aa` (openrtb2.x#188)](https://github.com/InteractiveAdvertisingBureau/openrtb2.x/pull/188)
 - [gRPC Documentation](https://grpc.io/docs/)
 - [Protocol Buffers](https://protobuf.dev/)
 - [OCI Container Specification](https://opencontainers.org/)
