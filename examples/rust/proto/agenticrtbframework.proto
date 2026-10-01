@@ -1,4 +1,4 @@
-edition = "2023";
+syntax = "proto3";
 
 package com.iabtechlab.bidstream.mutation.v1;
 
@@ -35,7 +35,7 @@ message RTBRequest {
   Ext ext = 99;
 
   message Ext {
-    extensions 500 to max;
+    // Extension fields can be modeled explicitly as needed.
   }
 }
 
@@ -195,7 +195,7 @@ message AdjustBidPayload {
 
 message MetricsPayload {
   // List of metrics to add
-  repeated com.iabtechlab.openrtb.v2.BidRequest.Metric metric = 1;
+  repeated com.iabtechlab.openrtb.v2.BidRequest.Imp.Metric metric = 1;
 }
 
 message DataPayload {
