@@ -1,0 +1,212 @@
+edition = "2023";
+
+package com.iabtechlab.bidstream.privacy.v1;
+
+// Privacy Context Extension for Agentic RTB Framework
+// 
+// This extension provides standardized privacy, consent, and data usage
+// constraints that propagate through agent-based bidstream processing.
+//
+// Reference: docs/privacy_context_extension.md
+
+// ------------------- Privacy Context Messages -------------------
+
+// PrivacyContext is the top-level privacy metadata container
+message PrivacyContext {
+  // Applicable regional privacy regulations
+  Regulations regulations = 1;
+
+  // User consent status and scope
+  Consent consent = 2;
+
+  // Data handling and minimization requirements
+  DataControls data_controls = 3;
+
+  // Execution boundaries and restrictions
+  ProcessingConstraints processing_constraints = 4;
+
+  // Traceability for consent verification
+  Audit audit = 5;
+}
+
+// Regulations indicates which privacy laws apply to this request
+message Regulations {
+  // European Union General Data Protection Regulation
+  bool gdpr = 1;
+
+  // California Consumer Privacy Act
+  bool ccpa = 2;
+
+  // California Privacy Rights Act
+  bool cpra = 3;
+
+  // Brazilian General Data Protection Law
+  bool lgpd = 4;
+
+  // Virginia Consumer Data Protection Act
+  bool vcdpa = 5;
+
+  // Other regional regulations can be added via extensions
+}
+
+// Consent represents user consent status and approved purposes
+message Consent {
+  // Consent status values
+  enum Status {
+    STATUS_UNSPECIFIED = 0;
+    GRANTED = 1;            // User explicitly granted consent
+    DENIED = 2;             // User explicitly denied consent
+    UNKNOWN = 3;            // Consent status could not be determined
+    NOT_REQUIRED = 4;       // Consent not required under applicable law
+  }
+
+  // Current consent status
+  Status status = 1;
+
+  // Approved processing purposes (e.g., "measurement", "personalization")
+  repeated string purposes = 2;
+
+  // Encoded consent string (e.g., IAB TCF format)
+  string consent_string = 3;
+
+  // Unix timestamp (milliseconds) when consent was captured
+  int64 timestamp_ms = 4;
+
+  // Consent scope identifier (e.g., domain, app bundle)
+  string scope = 5;
+}
+
+// DataControls specifies data handling requirements
+message DataControls {
+  // Indicates reduced data exposure is required
+  bool data_minimization = 1;
+
+  // Whether personally identifiable information (PII) is allowed
+  bool personal_data_allowed = 2;
+
+  // Maximum data retention period (milliseconds)
+  int64 retention_ttl_ms = 3;
+
+  // Whether data must be anonymized before processing
+  bool anonymization_required = 4;
+
+  // Minimum anonymization threshold (k-anonymity)
+  int32 anonymization_k = 5;
+
+  // Whether encryption at rest is required
+  bool encryption_required = 6;
+}
+
+// ProcessingConstraints defines execution boundaries
+message ProcessingConstraints {
+  // Geographic processing boundary (e.g., "EEA", "US", "BR")
+  string geo_scope = 1;
+
+  // Whitelist of agents permitted to access this data
+  repeated string allowed_agents = 2;
+
+  // Types of data enrichment explicitly forbidden
+  repeated string prohibited_enrichments = 3;
+
+  // Maximum processing latency allowed (milliseconds)
+  int32 max_processing_latency_ms = 4;
+
+  // Require confidential computing environment (TEE)
+  bool require_confidential_compute = 5;
+}
+
+// Audit provides traceability for consent verification
+message Audit {
+  // Whether upstream consent verification occurred
+  bool consent_verified = 1;
+
+  // Unix timestamp (milliseconds) of verification
+  int64 verification_timestamp_ms = 2;
+
+  // Identifier of the service that verified consent
+  string verifier_id = 3;
+
+  // Verification method used (e.g., "tcf_v2", "gpp_v1")
+  string verification_method = 4;
+
+  // Chain of custody for privacy context propagation
+  repeated string custody_chain = 5;
+}
+
+// ------------------- Privacy Validation Payload -------------------
+
+// PrivacyValidationPayload is used with VALIDATE_PRIVACY intent
+message PrivacyValidationPayload {
+  // Validation result
+  ValidationResult result = 1;
+
+  // Specific violations detected (if any)
+  repeated PolicyViolation violations = 2;
+
+  // Enforcement action taken
+  EnforcementAction action = 3;
+}
+
+// ValidationResult indicates compliance status
+message ValidationResult {
+  // Whether the request is compliant with privacy context
+  bool compliant = 1;
+
+  // Compliance score (0.0 = non-compliant, 1.0 = fully compliant)
+  double compliance_score = 2;
+
+  // Human-readable reason for compliance status
+  string reason = 3;
+
+  // Unix timestamp (milliseconds) when validation occurred
+  int64 validation_timestamp_ms = 4;
+}
+
+// PolicyViolation describes a specific privacy policy breach
+message PolicyViolation {
+  // Type of violation
+  enum ViolationType {
+    VIOLATION_UNSPECIFIED = 0;
+    CONSENT_DENIED = 1;
+    CONSENT_EXPIRED = 2;
+    GEOGRAPHIC_RESTRICTION = 3;
+    RETENTION_EXCEEDED = 4;
+    PROHIBITED_ENRICHMENT = 5;
+    UNAUTHORIZED_AGENT = 6;
+    PII_EXPOSURE = 7;
+  }
+
+  // Violation type
+  ViolationType type = 1;
+
+  // Human-readable description
+  string description = 2;
+
+  // Field path in request that caused violation
+  string violating_field = 3;
+
+  // Severity level (1 = low, 10 = critical)
+  int32 severity = 4;
+}
+
+// EnforcementAction describes the action taken in response to validation
+message EnforcementAction {
+  // Action types
+  enum ActionType {
+    ACTION_UNSPECIFIED = 0;
+    ALLOW = 1;              // Request allowed to proceed
+    BLOCK = 2;              // Request blocked entirely
+    STRIP_PII = 3;          // PII removed before processing
+    ANONYMIZE = 4;          // Data anonymized before processing
+    CONTEXTUAL_ONLY = 5;    // Downgrade to contextual-only auction
+  }
+
+  // Action taken
+  ActionType action = 1;
+
+  // Fields stripped or anonymized
+  repeated string affected_fields = 2;
+
+  // Human-readable explanation
+  string explanation = 3;
+}
