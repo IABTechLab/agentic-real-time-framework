@@ -27,7 +27,7 @@ The Agentic RTB Framework (ARTF) defines a standard for implementing agent servi
 - **Deal Management** - Activate, suppress, and adjust deals dynamically
 - **Bid Shading** - Optimize bid prices using intelligent pricing strategies
 - **Metrics Addition** - Add viewability and other metrics to impressions
-- **Data Segment Embeddings** - Attach Agentic Audiences data segments with required embeddings to the bid request
+- **Embeddings** - Attach Agentic Audiences data segments with required embeddings to the bid request
 
 ### Key Principles
 
@@ -227,9 +227,9 @@ message MetricsPayload {
 
 #### DataPayload
 
-Used for content data (`ADD_CIDS`) and for Agentic Audiences segments with embeddings (`ADD_DATA_SEGMENT_WITH_EMBEDDINGS`) via the `content_data` field.
+Used for content data (`ADD_CIDS`) and for Agentic Audiences segments with embeddings (`ADD_EMBEDDINGS`) via the `data` field.
 
-For `ADD_DATA_SEGMENT_WITH_EMBEDDINGS`, each `data.segment` **must** include `ext.aa` (OpenRTB Agentic Audiences envelope; see [openrtb2.x#188](https://github.com/InteractiveAdvertisingBureau/openrtb2.x/pull/188)).
+For `ADD_EMBEDDINGS`, each `data.segment` **must** include `ext.aa` (OpenRTB Agentic Audiences envelope; see [openrtb2.x#188](https://github.com/InteractiveAdvertisingBureau/openrtb2.x/pull/188)).
 
 ```protobuf
 message DataPayload {
@@ -237,7 +237,7 @@ message DataPayload {
 }
 ```
 
-See [docs/intents/ADD_DATA_SEGMENT_WITH_EMBEDDINGS.md](intents/ADD_DATA_SEGMENT_WITH_EMBEDDINGS.md) for intent-specific usage.
+See [docs/intents/add-embeddings.md](intents/add-embeddings.md) for intent-specific usage.
 
 ---
 
@@ -245,18 +245,18 @@ See [docs/intents/ADD_DATA_SEGMENT_WITH_EMBEDDINGS.md](intents/ADD_DATA_SEGMENT_
 
 ### Intent Enum
 
-| Value | Name                 | Description                                    |
-|-------|----------------------|------------------------------------------------|
-| 0     | `INTENT_UNSPECIFIED` | Unspecified (invalid)                          |
-| 1     | `ACTIVATE_SEGMENTS`  | Activate user segments by external segment IDs |
-| 2     | `ACTIVATE_DEALS`     | Activate deals by external deal IDs            |
-| 3     | `SUPPRESS_DEALS`     | Suppress deals by external deal IDs            |
-| 4     | `ADJUST_DEAL_FLOOR`  | Adjust the bid floor of a specific deal        |
-| 5     | `ADJUST_DEAL_MARGIN` | Adjust the deal margin of a specific deal      |
-| 6     | `BID_SHADE`          | Adjust the bid price of a specific bid         |
-| 7     | `ADD_METRICS`        | Add metrics to an impression                   |
-| 8     | `ADD_CIDS`           | Add extended content IDs                       |
-| 9     | `ADD_DATA_SEGMENT_WITH_EMBEDDINGS` | Add Agentic Audiences data segment(s) with required embeddings to the BidRequest |
+| Value | Name                 | Description                                           |
+|-------|----------------------|-------------------------------------------------------|
+| 0     | `INTENT_UNSPECIFIED` | Unspecified (invalid)                                 |
+| 1     | `ACTIVATE_SEGMENTS`  | Activate user segments by external segment IDs        |
+| 2     | `ACTIVATE_DEALS`     | Activate deals by external deal IDs                   |
+| 3     | `SUPPRESS_DEALS`     | Suppress deals by external deal IDs                   |
+| 4     | `ADJUST_DEAL_FLOOR`  | Adjust the bid floor of a specific deal               |
+| 5     | `ADJUST_DEAL_MARGIN` | Adjust the deal margin of a specific deal             |
+| 6     | `BID_SHADE`          | Adjust the bid price of a specific bid                |
+| 7     | `ADD_METRICS`        | Add metrics to an impression                          |
+| 8     | `ADD_CIDS`           | Add extended content IDs                              |
+| 9     | `ADD_EMBEDDINGS`     | Add Agentic Audiences data segment(s) with embeddings |
 
 ### Operation Enum
 
@@ -279,7 +279,7 @@ See [docs/intents/ADD_DATA_SEGMENT_WITH_EMBEDDINGS.md](intents/ADD_DATA_SEGMENT_
 | `BID_SHADE`          | AdjustBidPayload  | `/seatbid/{seat}/bid/{bidId}` |
 | `ADD_METRICS`        | MetricsPayload    | `/imp/{id}`                   |
 | `ADD_CIDS`           | DataPayload       | `/site/content/data` (`data.ext.cids`) |
-| `ADD_DATA_SEGMENT_WITH_EMBEDDINGS` | DataPayload (`content_data`) | `/user/data` |
+| `ADD_EMBEDDINGS`     | DataPayload       | `/user/data`                  |
 
 Detailed guides for each intent live in `docs/intents/`.
 
@@ -429,7 +429,7 @@ The container image must include an `agent-manifest` label with JSON metadata:
     "SUPPRESS_DEALS",
     "ADJUST_DEAL_FLOOR",
     "BID_SHADE",
-    "ADD_DATA_SEGMENT_WITH_EMBEDDINGS"
+    "ADD_EMBEDDINGS"
   ],
   "dependencies": {},
   "health": {
@@ -503,11 +503,11 @@ The container image must include an `agent-manifest` label with JSON metadata:
 }
 ```
 
-### Add Data Segment With Embeddings
+### Add Embeddings
 
 ```json
 {
-  "intent": "ADD_DATA_SEGMENT_WITH_EMBEDDINGS",
+  "intent": "ADD_EMBEDDINGS",
   "op": "OPERATION_ADD",
   "path": "/user/data",
   "content_data": {

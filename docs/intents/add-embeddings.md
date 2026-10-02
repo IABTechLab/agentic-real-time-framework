@@ -1,8 +1,8 @@
-# ADD_DATA_SEGMENT_WITH_EMBEDDINGS
+# ADD_EMBEDDINGS
 
 Attaches user data segments carrying Agentic Audiences embeddings.
 
-**Payload:** `DataPayload` via the `content_data` field. Each segment **must** include `ext.aa`.
+**Payload:** `DataPayload` via the `data` field. Each segment **must** include `ext.aa`.
 
 **Eligible paths:**
 - `/user/data` — targets the user.
@@ -26,7 +26,7 @@ Attaches user data segments carrying Agentic Audiences embeddings.
 
 ```json
 {
-  "intent": "ADD_DATA_SEGMENT_WITH_EMBEDDINGS",
+  "intent": "ADD_EMBEDDINGS",
   "op": "OPERATION_ADD",
   "path": "/user/data",
   "content_data": {
