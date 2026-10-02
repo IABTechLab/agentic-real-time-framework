@@ -99,7 +99,8 @@ message Mutation {
     // Metrics or telemetry data
     MetricsPayload metrics = 103;
 
-    // Content data
+    // Content data (also used by ADD_EMBEDDINGS;
+    // each segment must include ext.aa — see OpenRTB Segment.ext.aa)
     DataPayload content_data = 104;
   }
 
@@ -142,6 +143,10 @@ enum Intent {
 
   // Add extended content IDs
   ADD_CIDS = 8;
+
+  // Add Agentic Audiences embeddings to BidRequest.user.data segments
+  // Uses DataPayload (content_data); each segment must include ext.aa
+  ADD_EMBEDDINGS = 9;
 
   // More intents can be added in the future
 
