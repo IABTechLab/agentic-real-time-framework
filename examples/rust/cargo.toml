@@ -21,6 +21,7 @@ tokio-stream = "0.1.17"
 async-stream = "0.3.6"
 futures = "0.3.31"
 futures-util = "0.3.31"
+tonic-reflection = "0.14.6"
 
 [build-dependencies]
 tonic-prost-build = "0.14.2"
@@ -30,3 +31,6 @@ strip = true  # Automatically strip symbols from the binary.
 opt-level = "z"  # Optimize for size.
 lto = true  # Enable link-time optimization.
 codegen-units = 1  # Use a single codegen unit to reduce binary size.
+
+[dev-dependencies]
+prost-reflect = { version = "0.16.4", features = ["serde"] }
