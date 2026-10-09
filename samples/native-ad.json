@@ -60,7 +60,7 @@
       "w": 390,
       "h": 844,
       "pxratio": 3.0,
-      "js": 1,
+      "js": true,
       "language": "en",
       "connectiontype": 6,
       "ifa": "8A2E0A2B-3C4D-5E6F-7A8B-9C0D1E2F3A4B",
@@ -75,7 +75,7 @@
       }
     },
     "regs": {
-      "coppa": 0
+      "coppa": false
     }
   }
 }
