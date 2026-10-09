@@ -24,13 +24,13 @@ The example service:
 From the repo root:
 
 ```bash
-cargo build --manifest-path Cargo.toml
+cargo build --manifest-path examples/rust/Cargo.toml
 ```
 
 ## Run
 
 ```bash
-cargo run --manifest-path Cargo.toml
+cargo run --manifest-path examples/rust/Cargo.toml
 ```
 
 The example starts its gRPC server and an HTTP server on the configured ports.
@@ -45,7 +45,7 @@ This example uses proto files under `examples/rust/proto/`:
 Those protos are written in `proto3` syntax and import the OpenRTB definitions:
 
 ```proto
-import "com/iabtechlab/openrtb/v2.6/openrtb.proto";
+import "com/iabtechlab/openrtb/v2/openrtb.proto";
 ```
 
 The request and response messages include fields such as:

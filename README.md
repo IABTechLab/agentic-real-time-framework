@@ -73,7 +73,7 @@ This project implements a multi-protocol server that conforms to the ARTF specif
 #### Prerequisites
 
 - Go 1.23+
-- Protocol Buffers compiler (`protoc`) v3.21+
+- Protocol Buffers compiler (`protoc`) and Go plugins (optional, for regeneration)
 - Docker (optional, for containerized deployment)
 
 #### Critical Dependencies
@@ -96,16 +96,16 @@ Go module dependencies are managed in the workspace modules:
 | Package | Version | Purpose |
 |---------|---------|---------|
 | `google.golang.org/grpc` | 1.64.0 | gRPC framework |
-| `google.golang.org/protobuf` | 1.34.1 | Protocol Buffers runtime |
+| `google.golang.org/protobuf` | 1.36.11 | Protocol Buffers runtime |
 | `github.com/mark3labs/mcp-go` | 0.43.1 | Model Context Protocol server |
 
 #### Build and Run
 
 ```bash
-# Generate protobuf code (root repo task)
+# Optional: generate canonical protocol bindings (root repo task)
 make generate
 
-# Build the service binary
+# Build from checked-in protobuf code, without protoc
 make -C examples/golang build
 
 # Run with all interfaces enabled
@@ -142,8 +142,7 @@ cd examples/golang && docker compose up --build
 │       ├── health/      # Kubernetes health check endpoints
 │       ├── mcp/         # MCP server implementation
 │       └── web/         # Web UI for testing
-├── pkg/                  # Shared Go module for generated protobuf code
-│   └── pb/              # Generated protobuf Go code
+│   └── pkg/pb/          # Generated protobuf code in a local module
 ├── proto/               # Protocol buffer definitions
 │   ├── agenticrtbframework.proto  # ARTF service definition
 │   └── com/iabtechlab/openrtb/    # OpenRTB v2.6 definitions
@@ -193,6 +192,7 @@ The MCP server exposes an `extend_rtb` tool that accepts OpenRTB bid requests an
 | `--mcp-port` | 50052 | MCP server port (ignored when both Web and MCP enabled) |
 | `--web-port` | 8081 | Web interface port |
 | `--health-port` | 8080 | Health check HTTP port |
+| `--health-check` | false | Probe local readiness and exit 0 or 1 |
 
 #### Load Balancer Configuration
 
@@ -212,24 +212,21 @@ This configures the agent so that:
 
 ```bash
 # Run unit tests
-make test
+make -C examples/golang test
 
 # Run with coverage
-make test-coverage
+make -C examples/golang test-coverage
 
 # Test gRPC endpoint (requires grpcurl)
-make grpc-test
-
-# Test MCP endpoint
-make mcp-test
+make -C examples/golang grpc-test
 
 # Check health endpoints
-make health-check
+make -C examples/golang health-check
 
-# Send sample requests via MCP
-make sample-banner
-make sample-video
-make sample-bidshade
+# Send sample requests via gRPC
+make -C examples/golang sample-banner
+make -C examples/golang sample-video
+make -C examples/golang sample-bidshade
 ```
 
 ### Security

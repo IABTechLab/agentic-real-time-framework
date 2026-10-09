@@ -29,20 +29,20 @@ WORKDIR /usr/src/agenticrtbframework
 ENV BASE_DIR=/usr/src/agenticrtbframework
 ENV DATA_DIR=${BASE_DIR}/data
 
-RUN mkdir -p ${BASE_DIR}/proto
+RUN apt-get update && apt-get install -y --no-install-recommends protobuf-compiler \
+    && rm -rf /var/lib/apt/lists/*
 
-COPY proto/*.proto ${BASE_DIR}/proto/
-COPY src/*.rs ./src/
-COPY cargo.toml ./Cargo.toml
+COPY proto ./proto
+COPY src ./src
+COPY Cargo.toml Cargo.lock build.rs ./
 
-RUN cargo install --path .
-RUN apt-get update && apt-get install -y protobuf-compiler
+RUN cargo install --locked --path .
 
 ENV OUT_DIR=${BASE_DIR}/proto
 ENV ARTF_GRPC_SERVER_PORT=50051
 ENV ARTF_GRPC_MAX_CONNS=256
 ENV ARTF_HTTP_SERVER_PORT=8080
 
-EXPOSE ${ARTF_GRPC_SERVER_PORT} ${ARTF_HEALTH_SERVER_PORT}
+EXPOSE ${ARTF_GRPC_SERVER_PORT} ${ARTF_HTTP_SERVER_PORT}
 
 ENTRYPOINT ["agentic-rtb-framework-service"]

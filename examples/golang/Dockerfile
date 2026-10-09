@@ -5,7 +5,6 @@ WORKDIR /app
 
 # Copy workspace and project source needed for the multi-module setup.
 COPY go.work ./
-COPY pkg ./pkg
 COPY examples/golang ./examples/golang
 
 WORKDIR /app/examples/golang
@@ -76,7 +75,7 @@ USER nobody
 EXPOSE 50051 8081 8080
 
 HEALTHCHECK --interval=5s --timeout=3s --start-period=5s --retries=3 \
-   CMD ["/artf-agent", "-health-check"] || exit 1
+   CMD ["/artf-agent", "-health-check"]
 
 ENTRYPOINT ["/artf-agent"]
 CMD ["--enable-grpc", "--enable-mcp", "--enable-web", "--grpc-port=50051", "--web-port=8081", "--health-port=8080"]

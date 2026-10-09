@@ -350,39 +350,38 @@ readinessProbe:
 
 ### Prerequisites
 
-- Go 1.22+
-- Protocol Buffers compiler (`protoc`)
-- protoc-gen-go and protoc-gen-go-grpc plugins
-- Docker (for containerized deployment)
+- Go 1.23+ (required to `make -C examples/golang build`)
+- Protocol Buffers compiler (`protoc`) and Go plugins (optional: `make generate`)
+- Docker (optional, for containerized deployment)
 
 ### Build Commands
 
 | Command | Description |
 |---------|-------------|
-| `make deps` | Download Go dependencies |
-| `make generate` | Generate protobuf Go code |
-| `make build` | Build server binary |
-| `make test` | Run unit tests |
-| `make test-coverage` | Run tests with coverage report |
-| `make lint` | Run linter |
-| `make clean` | Remove build artifacts |
+| `make -C examples/golang deps` | Download Go dependencies |
+| `make generate` | Regenerate protobuf Go via `scripts/generate.sh` (requires protoc; not required to `make -C examples/golang build`) |
+| `make -C examples/golang build` | Build the Go agent binary from checked-in `examples/golang/pkg/pb/` |
+| `cargo build --manifest-path examples/rust/Cargo.toml` | Build the Rust reference service (`examples/rust/Cargo.toml`) |
+| `make -C examples/golang test` | Run unit tests |
+| `make -C examples/golang test-coverage` | Run tests with coverage report |
+| `make -C examples/golang lint` | `go vet ./...` |
 
 ### Run Commands
 
 | Command | Description |
 |---------|-------------|
-| `make run` | Run server locally |
-| `make docker-build` | Build Docker image |
-| `make docker-run` | Run Docker container |
-| `make docker-compose-up` | Start with docker-compose |
-| `make docker-compose-down` | Stop docker-compose services |
+| `make -C examples/golang run-all` | Run server locally (gRPC + MCP + web) |
+| `make -C examples/golang docker-build` | Build Docker image |
+| `make -C examples/golang docker-run-all` | Run Docker container |
+| `cd examples/golang && docker compose up --build` | Start with docker-compose |
+| `cd examples/golang && docker compose down` | Stop docker-compose services |
 
 ### Testing Commands
 
 | Command | Description |
 |---------|-------------|
-| `make grpc-test` | Test gRPC endpoint with grpcurl |
-| `make health-check` | Check health endpoints with curl |
+| `make -C examples/golang grpc-test` | Test gRPC endpoint with grpcurl |
+| `make -C examples/golang health-check` | Check health endpoints with curl |
 
 ---
 
@@ -394,6 +393,7 @@ readinessProbe:
 |------|---------|-------------|
 | `-grpc-port` | 50051 | gRPC server listening port |
 | `-health-port` | 8080 | Health check HTTP server port |
+| `-health-check` | false | Probe local `/health/ready` and exit 0/1 (container HEALTHCHECK) |
 
 ### Environment Variables
 
