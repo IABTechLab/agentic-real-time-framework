@@ -49,3 +49,51 @@ fn ids_payload(ids: &[&str]) -> IDsPayload {
         id: ids.iter().map(|id| id.to_string()).collect(),
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn metadata_uses_configured_versions() {
+        let metadata = build_metadata();
+        assert_eq!(metadata.api_version, API_VERSION);
+        assert_eq!(metadata.model_version, MODEL_VERSION);
+    }
+
+    #[test]
+    fn activate_segments_adds_ids_at_user_segment_path() {
+        let mutation = activate_segments(&["seg-1", "seg-2"]);
+        assert_eq!(mutation.intent, Intent::ActivateSegments as i32);
+        assert_eq!(mutation.op, Operation::Add as i32);
+        assert_eq!(mutation.path, PATH_USER_SEGMENT);
+        match mutation.value {
+            Some(Value::Ids(ids)) => assert_eq!(ids.id, vec!["seg-1", "seg-2"]),
+            other => panic!("expected IDs payload, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn activate_deals_adds_ids_at_given_path() {
+        let mutation = activate_deals("/imp/imp-1", &["deal-1"]);
+        assert_eq!(mutation.intent, Intent::ActivateDeals as i32);
+        assert_eq!(mutation.op, Operation::Add as i32);
+        assert_eq!(mutation.path, "/imp/imp-1");
+        match mutation.value {
+            Some(Value::Ids(ids)) => assert_eq!(ids.id, vec!["deal-1"]),
+            other => panic!("expected IDs payload, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn bid_shade_replaces_price_at_given_path() {
+        let mutation = bid_shade("/seatbid/dsp-001/bid/bid-abc", 4.675);
+        assert_eq!(mutation.intent, Intent::BidShade as i32);
+        assert_eq!(mutation.op, Operation::Replace as i32);
+        assert_eq!(mutation.path, "/seatbid/dsp-001/bid/bid-abc");
+        match mutation.value {
+            Some(Value::AdjustBid(adjust)) => assert_eq!(adjust.price, 4.675),
+            other => panic!("expected AdjustBid payload, got {other:?}"),
+        }
+    }
+}

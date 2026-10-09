@@ -30,3 +30,6 @@ strip = true  # Automatically strip symbols from the binary.
 opt-level = "z"  # Optimize for size.
 lto = true  # Enable link-time optimization.
 codegen-units = 1  # Use a single codegen unit to reduce binary size.
+
+[dev-dependencies]
+prost-reflect = { version = "0.16.4", features = ["serde"] }
