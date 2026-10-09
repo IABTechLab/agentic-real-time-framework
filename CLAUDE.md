@@ -19,16 +19,23 @@ The Agentic RTB Framework defines a standard for implementing agent services tha
 .
 ├── CLAUDE.md                           # This file
 ├── README.md                           # Project readme
-├── Makefile                            # Build automation
-├── Dockerfile                          # Container build
-├── cmd/agent/                          # Main entry point
-├── internal/
-│   ├── agent/                          # gRPC service implementation
-│   ├── mcp/                            # MCP interface implementation
-│   ├── handlers/                       # Mutation handlers
-│   ├── health/                         # Health check endpoints
-│   └── web/                            # Web UI
-├── pkg/pb/                             # Generated protobuf code
+├── Makefile                            # Root proto generation tasks
+├── go.work                             # Workspace for repo modules
+├── examples/golang/
+│   ├── cmd/agent/                      # Main entry point
+│   ├── internal/
+│   │   ├── agent/                      # gRPC service implementation
+│   │   ├── mcp/                        # MCP interface implementation
+│   │   ├── handlers/                   # Mutation handlers
+│   │   ├── health/                     # Health check endpoints
+│   │   └── web/                        # Web UI
+│   ├── Dockerfile                      # Container build
+│   ├── docker-compose.yml              # Local development setup
+│   ├── federation.example.yaml         # Example federation config
+│   └── Makefile                        # Service build and run tasks
+├── examples/golang/pkg/
+│   ├── go.mod                          # Shared protobuf module
+│   └── pb/                             # Generated protobuf code
 ├── proto/                              # Protobuf definitions
 ├── docs/                               # Documentation
 └── samples/                            # Sample request payloads
@@ -84,19 +91,22 @@ service RTBExtensionPoint {
 ## Development Commands
 
 ```bash
-# Build the agent (includes protobuf generation)
-make build
+# Generate protobuf files from the shared schema
+make generate
+
+# Build the agent service
+make -C examples/golang build
 
 # Run with all interfaces enabled (gRPC, MCP, Web)
-make run-all
+make -C examples/golang run-all
 
 # Run specific interfaces
-make run-grpc    # gRPC only (port 50051)
-make run-mcp     # MCP only (port 50052)
-make run-web     # Web + MCP (ports 8081, 50052)
+make -C examples/golang run-grpc    # gRPC only (port 50051)
+make -C examples/golang run-mcp     # MCP only (port 50052)
+make -C examples/golang run-web     # Web + MCP (ports 8081, 50052)
 
 # Run tests
-make test
+make -C examples/golang test
 
 # Build Docker image
 make docker-build
@@ -218,7 +228,7 @@ Containers must include an `agent-manifest` label in image metadata with:
 
 The protobuf imports OpenRTB v2.6 definitions:
 ```protobuf
-import "com/iabtechlab/openrtb/v2.6/openrtb.proto";
+import "com/iabtechlab/openrtb/v2/openrtb.proto";
 ```
 
 You'll need the IAB Tech Lab OpenRTB protobuf definitions from:

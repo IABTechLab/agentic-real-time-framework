@@ -1,72 +1,17 @@
-# Agentic RTB Framework Makefile
+# Root-level repository tasks
+# Keep the root Makefile focused on shared proto generation.
 
-BINARY=artf-agent
-LANGUAGES=go # cpp go csharp objc python ruby js
+.PHONY: generate fetch-openrtb
 
-# Go build and run targets
-.PHONY: build run-all run-grpc run-mcp run-web test
+LANG ?= go
+LANGS ?= $(LANG)
 
-build:
-	go build -o $(BINARY) ./cmd/agent
+generate: fetch-openrtb
+	mkdir -p pkg
+	./scripts/generate.sh --lang $(LANGS)
 
-run-all: build
-	./$(BINARY) --enable-grpc --enable-mcp --enable-web
-
-run-grpc: build
-	./$(BINARY) --enable-grpc
-
-run-mcp: build
-	./$(BINARY) --enable-mcp
-
-run-web: build
-	./$(BINARY) --enable-mcp --enable-web
-
-test:
-	go test ./...
-
-# Rust build and run targets
-RUST_BINARY=rust/target/release/agentic-rtb-framework-service
-
-.PHONY: build-rust run-rust build-all
-
-build-rust:
-	cd rust && cargo build --release
-
-run-rust: build-rust
-	ARTF_GRPC_SERVER_PORT=50053 ARTF_HTTP_SERVER_PORT=8082 $(RUST_BINARY)
-
-build-all: build build-rust
-
-# Protobuf targets
-
-bindings:
-	for x in ${LANGUAGES}; do \
-		protoc --proto_path=. \
-			--$${x}_out=. \
-			--experimental_editions \
-			openrtb.proto agenticrtbframework.proto; \
-		protoc --proto_path=. \
-			--$${x}_out=. \
-			--$${x}-grpc_out=require_unimplemented_servers=false:. \
-			agenticrtbframeworkservices.proto; \
-	done
-
-check:
-	prototool lint
-
-clean:
-	for x in ${LANGUAGES}; do \
-		rm -fr $${x}/*; \
-	done
-
-docs:
-	podman run --rm \
-		-v ${PWD}:${PWD} \
-		-w ${PWD} \
-		pseudomuto/protoc-gen-doc \
-		--doc_opt=html,doc.html \
-		--proto_path=${PWD} \
-		openrtb.proto agenticrtbframework.proto agenticrtbframeworkservices.proto
-
-watch:
-	fswatch  -r ./ | xargs -n1 make docs
+fetch-openrtb:
+	mkdir -p proto/com/iabtechlab/openrtb/v2
+	curl -L --fail \
+		https://raw.githubusercontent.com/InteractiveAdvertisingBureau/openrtb2.x/main/proto/src/main/com/iabtechlab/openrtb/v2/openrtb.proto \
+		-o proto/com/iabtechlab/openrtb/v2/openrtb.proto
