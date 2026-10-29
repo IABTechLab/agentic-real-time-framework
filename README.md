@@ -73,7 +73,7 @@ This project implements a multi-protocol server that conforms to the ARTF specif
 #### Prerequisites
 
 - Go 1.23+
-- Protocol Buffers compiler (`protoc`) v3.21+
+- Protocol Buffers compiler (`protoc`) v27+ (required for `edition = "2023"` protos)
 - Docker (optional, for containerized deployment)
 
 #### Critical Dependencies
@@ -82,7 +82,7 @@ The following tools must be installed to generate protobuf code:
 
 | Tool | Version | Installation |
 |------|---------|--------------|
-| `protoc` | 3.21+ | System package manager or [releases](https://github.com/protocolbuffers/protobuf/releases) |
+| `protoc` | 27+ | System package manager or [releases](https://github.com/protocolbuffers/protobuf/releases) |
 | `protoc-gen-go` | 1.34+ | `go install google.golang.org/protobuf/cmd/protoc-gen-go@latest` |
 | `protoc-gen-go-grpc` | 1.4+ | `go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest` |
 
@@ -96,7 +96,7 @@ Go module dependencies are managed in the workspace modules:
 | Package | Version | Purpose |
 |---------|---------|---------|
 | `google.golang.org/grpc` | 1.64.0 | gRPC framework |
-| `google.golang.org/protobuf` | 1.34.1 | Protocol Buffers runtime |
+| `google.golang.org/protobuf` | 1.36.11 | Protocol Buffers runtime |
 | `github.com/mark3labs/mcp-go` | 0.43.1 | Model Context Protocol server |
 
 #### Build and Run
@@ -128,6 +128,15 @@ make -C examples/golang docker-run-all
 
 # Or use the service compose file
 cd examples/golang && docker compose up --build
+```
+
+#### Rust Implementation
+
+A Rust example lives in `examples/rust/` (see its [README](examples/rust/README.md)):
+
+```bash
+# Build and run the Rust server (gRPC on 50051, HTTP health on 8080)
+cargo run --manifest-path examples/rust/Cargo.toml
 ```
 
 ### Architecture
@@ -212,24 +221,17 @@ This configures the agent so that:
 
 ```bash
 # Run unit tests
-make test
+make -C examples/golang test
 
-# Run with coverage
-make test-coverage
-
-# Test gRPC endpoint (requires grpcurl)
-make grpc-test
-
-# Test MCP endpoint
-make mcp-test
+# Test gRPC endpoint manually (requires grpcurl)
+grpcurl -plaintext localhost:50051 describe
+grpcurl -plaintext -d @ localhost:50051 \
+  com.iabtechlab.bidstream.mutation.services.v1.RTBExtensionPoint/GetMutations \
+  < samples/banner-basic.json
 
 # Check health endpoints
-make health-check
-
-# Send sample requests via MCP
-make sample-banner
-make sample-video
-make sample-bidshade
+curl http://localhost:8080/health/live
+curl http://localhost:8080/health/ready
 ```
 
 ### Security
