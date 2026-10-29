@@ -6,7 +6,7 @@ require (
 	github.com/iabtechlab/agentic-rtb-framework/pkg v0.0.0
 	github.com/mark3labs/mcp-go v0.43.1
 	google.golang.org/grpc v1.64.0
-	google.golang.org/protobuf v1.34.1
+	google.golang.org/protobuf v1.36.11
 	gopkg.in/yaml.v3 v3.0.1
 )
 
