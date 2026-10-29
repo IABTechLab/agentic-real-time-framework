@@ -40,7 +40,7 @@ pub fn bid_shade(path: &str, price: f64) -> Mutation {
         intent: Intent::BidShade.into(),
         op: Operation::Replace.into(),
         path: path.to_string(),
-        value: Some(Value::AdjustBid(AdjustBidPayload { price: price })),
+        value: Some(Value::AdjustBid(AdjustBidPayload { price })),
     }
 }
 

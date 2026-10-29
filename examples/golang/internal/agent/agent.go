@@ -63,10 +63,7 @@ func (a *ARTFAgent) GetMutations(ctx context.Context, req *pb.RTBRequest) (*pb.R
 	bidRequest := req.GetBidRequest()
 	bidResponse := req.GetBidResponse()
 
-	// NOTE: applicable_intents is defined in the proto spec but not yet in the generated Go code.
-	// After regenerating protos with `make bindings`, use: applicableIntents := req.GetApplicableIntents()
-	// For now, pass nil which means all intents are applicable.
-	var applicableIntents []pb.Intent
+	applicableIntents := req.GetApplicableIntents()
 
 	log.Printf("Processing request %s at lifecycle stage %v with applicable_intents=%v",
 		req.GetId(), lifecycle, applicableIntents)

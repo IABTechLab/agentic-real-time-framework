@@ -33,7 +33,7 @@ The Agentic RTB Framework defines a standard for implementing agent services tha
 │   ├── docker-compose.yml              # Local development setup
 │   ├── federation.example.yaml         # Example federation config
 │   └── Makefile                        # Service build and run tasks
-├── examples/golang/pkg/
+├── pkg/
 │   ├── go.mod                          # Shared protobuf module
 │   └── pb/                             # Generated protobuf code
 ├── proto/                              # Protobuf definitions
