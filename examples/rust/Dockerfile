@@ -1,48 +1,50 @@
+# Build stage
+FROM rust:slim-trixie AS builder
 
-FROM rust:slim
+# build.rs compiles the protos at build time and needs protoc.
+RUN apt-get update && apt-get install -y --no-install-recommends protobuf-compiler \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /usr/src/agenticrtbframework
+
+COPY Cargo.toml Cargo.lock build.rs ./
+COPY proto ./proto
+COPY src ./src
+
+RUN cargo build --release --locked
+
+# Runtime stage
+FROM debian:trixie-slim
 
 LABEL agent-manifest='{ \
         "name": "agentic-rtb-framework", \
         "version": "1.0.0", \
         "vendor": "reference-vendor", \
         "owner": "owner@example.com", \
-        "resources": {    \
+        "description": "Agentic RTB Framework Service", \
+        "resources": { \
             "cpu": "500m", \
             "memory": "256Mi" \
         }, \
-        "intents"=["ACTIVATE_SEGMENTS", "ACTIVATE_DEALS", "BID_SHADE"], \
-        "description": "Agentic RTB Framework Service"  \
-        "dependencies": { \
-            "audienceService": {"service": "audience-svc",  "port": 50051}   \
-        },  \
-        "health": {   \
-            "livenessProbe": {    \
+        "intents": ["ACTIVATE_SEGMENTS", "ACTIVATE_DEALS", "BID_SHADE"], \
+        "health": { \
+            "livenessProbe": { \
                 "httpGet": { "path": "/health/live", "port": 8080 } \
-            },  \
-            "readinessProbe": {   \
-                "httpGet": { "path": "/health/ready", "port": 8080 }    \
-            }   \
+            }, \
+            "readinessProbe": { \
+                "httpGet": { "path": "/health/ready", "port": 8080 } \
+            } \
         } \
     }'
 
-WORKDIR /usr/src/agenticrtbframework
-ENV BASE_DIR=/usr/src/agenticrtbframework
-ENV DATA_DIR=${BASE_DIR}/data
+COPY --from=builder /usr/src/agenticrtbframework/target/release/agentic-rtb-framework-service /usr/local/bin/agentic-rtb-framework-service
 
-RUN mkdir -p ${BASE_DIR}/proto
-
-COPY proto/*.proto ${BASE_DIR}/proto/
-COPY src/*.rs ./src/
-COPY Cargo.toml ./Cargo.toml
-
-RUN cargo install --path .
-RUN apt-get update && apt-get install -y protobuf-compiler
-
-ENV OUT_DIR=${BASE_DIR}/proto
 ENV ARTF_GRPC_SERVER_PORT=50051
-ENV ARTF_GRPC_MAX_CONNS=256
 ENV ARTF_HTTP_SERVER_PORT=8080
+ENV ARTF_MAX_CONNS=256
 
-EXPOSE ${ARTF_GRPC_SERVER_PORT} ${ARTF_HEALTH_SERVER_PORT}
+USER nobody
+
+EXPOSE 50051 8080
 
 ENTRYPOINT ["agentic-rtb-framework-service"]
