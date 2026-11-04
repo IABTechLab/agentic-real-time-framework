@@ -18,7 +18,7 @@ The Agentic RTB Framework defines a standard for implementing agent services tha
 ```
 .
 ├── CLAUDE.md                           # This file
-├── README.md                           # Project readme
+├── ../README.md                        # Project readme
 ├── Makefile                            # Root proto generation tasks
 ├── go.work                             # Workspace for repo modules
 ├── examples/golang/
@@ -37,8 +37,8 @@ The Agentic RTB Framework defines a standard for implementing agent services tha
 │   ├── go.mod                          # Shared protobuf module
 │   └── pb/                             # Generated protobuf code
 ├── proto/                              # Protobuf definitions
-├── SPECIFICATION.md                    # ARTF v1.0 specification
-├── IMPLEMENTATION.md                   # Implementation guidance
+├── ../SPECIFICATION.md                 # ARTF v1.0 specification
+├── ../IMPLEMENTATION.md                # Implementation guidance
 └── samples/                            # Sample request payloads
 ```
 

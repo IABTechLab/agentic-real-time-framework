@@ -1,0 +1,38 @@
+# Binaries
+artf-agent
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+target/
+
+# Test binary, built with `go test -c`
+*.test
+
+# Output of the go coverage tool
+coverage.out
+coverage.html
+
+# Generated protobuf files (uncomment if you want to commit generated files)
+# pkg/pb/**/*.pb.go
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Local environment
+.env
+.env.local
+
+# Temporary files
+tmp/
+temp/

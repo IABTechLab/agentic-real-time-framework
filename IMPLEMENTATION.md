@@ -19,13 +19,17 @@ Non-normative guidance for implementers of the [Agentic Real Time Framework spec
    - [ADD_CIDS](#add_cids)
    - [ADD_EMBEDDINGS](#add_embeddings)
 4. [JSON Examples](#json-examples)
-   - [banner-basic.json](samples/banner-basic.json)
-   - [bid-shading.json](samples/bid-shading.json)
-   - [multi-impression.json](samples/multi-impression.json)
-   - [native-ad.json](samples/native-ad.json)
-   - [video-deals.json](samples/video-deals.json)
+   - [banner-basic.json](implementation/samples/banner-basic.json)
+   - [bid-shading.json](implementation/samples/bid-shading.json)
+   - [multi-impression.json](implementation/samples/multi-impression.json)
+   - [native-ad.json](implementation/samples/native-ad.json)
+   - [video-deals.json](implementation/samples/video-deals.json)
 5. [Scripts](#scripts)
-   - [generate.sh](scripts/generate.sh)
+   - [generate.sh](implementation/scripts/generate.sh)
+6. [Example Implementations](#example-implementations)
+   - [Go](implementation/examples/golang)
+   - [Rust](implementation/examples/rust)
+7. [Protocol Buffers](#protocol-buffers)
 
 
 ---
@@ -1482,13 +1486,13 @@ Attaches user data segments carrying Agentic Audiences embeddings.
 
 ## JSON Examples
 
-Sample ORTB payloads for testing. The Rust tests in [`examples/rust/src/sample_tests.rs`](examples/rust/src/sample_tests.rs) load these files directly.
+Sample ORTB payloads for testing. The Rust tests in [`examples/rust/src/sample_tests.rs`](implementation/examples/rust/src/sample_tests.rs) load these files directly.
 
-- [banner-basic.json](samples/banner-basic.json)
-- [bid-shading.json](samples/bid-shading.json)
-- [multi-impression.json](samples/multi-impression.json)
-- [native-ad.json](samples/native-ad.json)
-- [video-deals.json](samples/video-deals.json)
+- [banner-basic.json](implementation/samples/banner-basic.json)
+- [bid-shading.json](implementation/samples/bid-shading.json)
+- [multi-impression.json](implementation/samples/multi-impression.json)
+- [native-ad.json](implementation/samples/native-ad.json)
+- [video-deals.json](implementation/samples/video-deals.json)
 
 
 ---
@@ -1497,4 +1501,23 @@ Sample ORTB payloads for testing. The Rust tests in [`examples/rust/src/sample_t
 
 Build and utility scripts.
 
-- [generate.sh](scripts/generate.sh) — generates protobuf bindings for one or more target languages (run via `make generate`).
+- [generate.sh](implementation/scripts/generate.sh) — generates protobuf bindings for one or more target languages (run via `make -C implementation generate`).
+
+---
+
+## Example Implementations
+
+Reference implementations of the framework. Each has its own README with build and run instructions.
+
+- [Go](implementation/examples/golang) — gRPC, MCP and web interfaces (see [Go Implementation](#go-implementation) and [MCP Integration](#mcp-integration))
+- [Rust](implementation/examples/rust)
+
+---
+
+## Protocol Buffers
+
+The gRPC/protobuf definitions of the framework's services and messages.
+
+- [agenticrtbframework.proto](implementation/proto/agenticrtbframework.proto)
+- [agenticrtbframeworkservices.proto](implementation/proto/agenticrtbframeworkservices.proto)
+- [openrtb.proto](implementation/proto/com/iabtechlab/openrtb/v2/openrtb.proto) — OpenRTB v2.6 messages
