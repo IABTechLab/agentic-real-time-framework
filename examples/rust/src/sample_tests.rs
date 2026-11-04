@@ -56,10 +56,12 @@ fn all_samples_decode_as_rtb_requests() {
 
 #[tokio::test]
 async fn samples_drive_demo_evaluator_mutations() {
+    // bid-shading.json declares only BID_SHADE applicable, so the demo
+    // evaluator's segment and deal mutations for that auction are filtered out.
     let cases = [
         ("banner-basic.json", 2),
         ("video-deals.json", 2),
-        ("bid-shading.json", 3),
+        ("bid-shading.json", 1),
         ("multi-impression.json", 4),
         ("native-ad.json", 2),
     ];
