@@ -37,7 +37,8 @@ The Agentic RTB Framework defines a standard for implementing agent services tha
 │   ├── go.mod                          # Shared protobuf module
 │   └── pb/                             # Generated protobuf code
 ├── proto/                              # Protobuf definitions
-├── docs/                               # Documentation
+├── SPECIFICATION.md                    # ARTF v1.0 specification
+├── IMPLEMENTATION.md                   # Implementation guidance
 └── samples/                            # Sample request payloads
 ```
 

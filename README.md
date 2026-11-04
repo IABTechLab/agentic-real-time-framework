@@ -148,7 +148,8 @@ cd examples/golang && docker compose up --build
 │   ├── agenticrtbframework.proto  # ARTF service definition
 │   └── com/iabtechlab/openrtb/    # OpenRTB v2.6 definitions
 ├── samples/             # Sample ORTB payloads for testing
-├── docs/                # Specifications and documentation
+├── SPECIFICATION.md     # ARTF v1.0 specification
+├── IMPLEMENTATION.md    # Implementation guidance
 ├── scripts/             # Build and utility scripts
 ├── Makefile             # Root proto generation tasks
 └── go.work              # Go workspace for repo modules
@@ -244,8 +245,11 @@ This implementation follows ARTF security requirements:
 
 ### Documentation
 
-- [Implementation Specification](docs/00-EXAMPLE.md)
-- [MCP Integration Guide](docs/01-MCP.md)
+- [ARTF Specification](SPECIFICATION.md)
+- [Implementation Guidance](IMPLEMENTATION.md)
+  - [Go Implementation](IMPLEMENTATION.md#go-implementation)
+  - [MCP Integration Guide](IMPLEMENTATION.md#mcp-integration)
+  - [Intents](IMPLEMENTATION.md#intents)
 
 ### AI Assistant Integration (MCP)
 
