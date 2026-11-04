@@ -27,6 +27,7 @@ The Agentic RTB Framework (ARTF) defines a standard for implementing agent servi
 - **Deal Management** - Activate, suppress, and adjust deals dynamically
 - **Bid Shading** - Optimize bid prices using intelligent pricing strategies
 - **Metrics Addition** - Add viewability and other metrics to impressions
+- **Embeddings** - Attach Agentic Audiences data segments with required embeddings to the bid request
 
 ### Key Principles
 
@@ -226,7 +227,9 @@ message MetricsPayload {
 
 #### DataPayload
 
-Used for adding content data, including content IDs in `data.ext.cids`.
+Used for content data (`ADD_CIDS`) and for Agentic Audiences segments with embeddings (`ADD_EMBEDDINGS`) via the `data` field.
+
+For `ADD_EMBEDDINGS`, each `data.segment` **must** include `ext.aa` (OpenRTB Agentic Audiences envelope; see [openrtb2.x#188](https://github.com/InteractiveAdvertisingBureau/openrtb2.x/pull/188)).
 
 ```protobuf
 message DataPayload {
@@ -234,23 +237,26 @@ message DataPayload {
 }
 ```
 
+See [docs/intents/add-embeddings.md](intents/add-embeddings.md) for intent-specific usage.
+
 ---
 
 ## Intents and Operations
 
 ### Intent Enum
 
-| Value | Name                 | Description                                    |
-|-------|----------------------|------------------------------------------------|
-| 0     | `INTENT_UNSPECIFIED` | Unspecified (invalid)                          |
-| 1     | `ACTIVATE_SEGMENTS`  | Activate user segments by external segment IDs |
-| 2     | `ACTIVATE_DEALS`     | Activate deals by external deal IDs            |
-| 3     | `SUPPRESS_DEALS`     | Suppress deals by external deal IDs            |
-| 4     | `ADJUST_DEAL_FLOOR`  | Adjust the bid floor of a specific deal        |
-| 5     | `ADJUST_DEAL_MARGIN` | Adjust the deal margin of a specific deal      |
-| 6     | `BID_SHADE`          | Adjust the bid price of a specific bid         |
-| 7     | `ADD_METRICS`        | Add metrics to an impression                   |
-| 8     | `ADD_CIDS`           | Add extended content IDs                       |
+| Value | Name                 | Description                                           |
+|-------|----------------------|-------------------------------------------------------|
+| 0     | `INTENT_UNSPECIFIED` | Unspecified (invalid)                                 |
+| 1     | `ACTIVATE_SEGMENTS`  | Activate user segments by external segment IDs        |
+| 2     | `ACTIVATE_DEALS`     | Activate deals by external deal IDs                   |
+| 3     | `SUPPRESS_DEALS`     | Suppress deals by external deal IDs                   |
+| 4     | `ADJUST_DEAL_FLOOR`  | Adjust the bid floor of a specific deal               |
+| 5     | `ADJUST_DEAL_MARGIN` | Adjust the deal margin of a specific deal             |
+| 6     | `BID_SHADE`          | Adjust the bid price of a specific bid                |
+| 7     | `ADD_METRICS`        | Add metrics to an impression                          |
+| 8     | `ADD_CIDS`           | Add extended content IDs                              |
+| 9     | `ADD_EMBEDDINGS`     | Add Agentic Audiences data segment(s) with embeddings |
 
 ### Operation Enum
 
@@ -273,6 +279,7 @@ message DataPayload {
 | `BID_SHADE`          | AdjustBidPayload  | `/seatbid/{seat}/bid/{bidId}` |
 | `ADD_METRICS`        | MetricsPayload    | `/imp/{id}`                   |
 | `ADD_CIDS`           | DataPayload       | `/site/content/data` (`data.ext.cids`) |
+| `ADD_EMBEDDINGS`     | DataPayload       | `/user/data`                  |
 
 Detailed guides for each intent live in `docs/intents/`.
 
@@ -421,7 +428,8 @@ The container image must include an `agent-manifest` label with JSON metadata:
     "ACTIVATE_DEALS",
     "SUPPRESS_DEALS",
     "ADJUST_DEAL_FLOOR",
-    "BID_SHADE"
+    "BID_SHADE",
+    "ADD_EMBEDDINGS"
   ],
   "dependencies": {},
   "health": {
@@ -495,17 +503,51 @@ The container image must include an `agent-manifest` label with JSON metadata:
 }
 ```
 
+### Add Embeddings
+
+```json
+{
+  "intent": "ADD_EMBEDDINGS",
+  "op": "OPERATION_ADD",
+  "path": "/user/data",
+  "content_data": {
+    "data": [
+      {
+        "name": "data-provider",
+        "segment": [
+          {
+            "id": "seg-ctx-001",
+            "name": "descriptive-name",
+            "ext": {
+              "aa": {
+                "ver": "1.0.0",
+                "vector": "mpkZPq5HYb5SuJ4+PQrXPo/C9T7NzEy97FE4Pilcj74=",
+                "dimension": 8,
+                "model": "sbert-mini-ctx-001",
+                "type": [2]
+              }
+            }
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
 ---
 
 ## References
 
 - [IAB Tech Lab Agentic RTB Framework v1.0](https://iabtechlab.com/standards/artf/)
 - [OpenRTB v2.6 Specification](https://iabtechlab.com/standards/openrtb/)
+- [IAB OpenRTB Agentic Audiences community extension](https://github.com/InteractiveAdvertisingBureau/openrtb/blob/main/extensions/community_extensions/agentic-audiences.md)
+- [OpenRTB protobuf `Segment.ext.aa` (openrtb2.x#188)](https://github.com/InteractiveAdvertisingBureau/openrtb2.x/pull/188)
 - [gRPC Documentation](https://grpc.io/docs/)
 - [Protocol Buffers](https://protobuf.dev/)
 - [OCI Container Specification](https://opencontainers.org/)
 
 ---
 
-*Document Version: 1.0.0*
-*Last Updated: November 2025*
+*Document Version: 1.1.0*
+*Last Updated: September 2026*

@@ -111,7 +111,7 @@
       "devicetype": 2,
       "ip": "203.0.113.50",
       "language": "en",
-      "js": 1,
+      "js": true,
       "geo": {
         "country": "USA",
         "region": "TX",
@@ -119,12 +119,12 @@
       }
     },
     "regs": {
-      "coppa": 0,
-      "gdpr": 0,
+      "coppa": false,
+      "gdpr": false,
       "us_privacy": "1YNN"
     },
     "source": {
-      "fd": 1,
+      "fd": true,
       "tid": "transaction-abc-123"
     },
     "at": 1,
