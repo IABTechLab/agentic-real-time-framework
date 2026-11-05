@@ -19,9 +19,13 @@
 package health
 
 import (
+	"context"
 	"encoding/json"
+	"fmt"
 	"net/http"
+	"strings"
 	"sync"
+	"time"
 )
 
 // Checker implements liveness and readiness probes
@@ -92,4 +96,24 @@ func (c *Checker) ReadinessHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	json.NewEncoder(w).Encode(response)
+}
+
+// Probe GETs origin/health/ready. Used by the process-local -health-check flag
+// so Docker HEALTHCHECK does not need curl or wget in the image.
+func Probe(ctx context.Context, origin string) error {
+	u := strings.TrimRight(origin, "/") + "/health/ready"
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u, nil)
+	if err != nil {
+		return err
+	}
+	client := &http.Client{Timeout: 2 * time.Second}
+	resp, err := client.Do(req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("%s returned %s", u, resp.Status)
+	}
+	return nil
 }

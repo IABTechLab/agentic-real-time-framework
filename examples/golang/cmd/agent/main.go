@@ -72,6 +72,9 @@ var (
 
 	// Version flag
 	showVersion = flag.Bool("version", false, "Show version information")
+
+	// One-shot probe for Docker HEALTHCHECK / compose. Does not start the server.
+	healthCheck = flag.Bool("health-check", false, "Probe local /health/ready and exit 0/1")
 )
 
 func main() {
@@ -80,6 +83,17 @@ func main() {
 	// Show version and exit
 	if *showVersion {
 		fmt.Printf("ARTF Agent v%s (built: %s)\n", Version, BuildTime)
+		os.Exit(0)
+	}
+
+	if *healthCheck {
+		origin := fmt.Sprintf("http://127.0.0.1:%d", *healthPort)
+		ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+		defer cancel()
+		if err := health.Probe(ctx, origin); err != nil {
+			log.Printf("health-check: %v", err)
+			os.Exit(1)
+		}
 		os.Exit(0)
 	}
 
