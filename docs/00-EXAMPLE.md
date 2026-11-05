@@ -357,8 +357,8 @@ readinessProbe:
 
 ### Prerequisites
 
-- Go 1.23+ (required to `make -C examples/golang build`)
-- Protocol Buffers compiler (`protoc`) and Go plugins (optional: `make generate`)
+- Go 1.23+
+- Protocol Buffers compiler (`protoc`) and Go plugins (for `make generate`)
 - Docker (optional, for containerized deployment)
 
 ### Build Commands
@@ -366,9 +366,8 @@ readinessProbe:
 | Command | Description |
 |---------|-------------|
 | `make -C examples/golang deps` | Download Go dependencies |
-| `make generate` | Regenerate protobuf Go via `scripts/generate.sh` (requires protoc; not required to `make -C examples/golang build`) |
-| `make -C examples/golang build` | Build the Go agent binary from checked-in `examples/golang/pkg/pb/` |
-| `cargo build --manifest-path examples/rust/Cargo.toml` | Build the Rust reference service (`examples/rust/Cargo.toml`) |
+| `make generate` | Regenerate protobuf Go via `scripts/generate.sh` (requires protoc) |
+| `make -C examples/golang build` | Build the Go agent binary |
 | `make -C examples/golang test` | Run unit tests |
 | `make -C examples/golang test-coverage` | Run tests with coverage report |
 | `make -C examples/golang lint` | `go vet ./...` |

@@ -5,6 +5,7 @@ WORKDIR /app
 
 # Copy workspace and project source needed for the multi-module setup.
 COPY go.work ./
+COPY pkg ./pkg
 COPY examples/golang ./examples/golang
 
 WORKDIR /app/examples/golang
