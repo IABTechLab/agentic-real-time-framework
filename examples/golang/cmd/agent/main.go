@@ -39,6 +39,8 @@ import (
 	"github.com/iabtechlab/agentic-rtb-framework/examples/golang/internal/mcp"
 	"github.com/iabtechlab/agentic-rtb-framework/examples/golang/internal/web"
 	"google.golang.org/grpc"
+	grpchealth "google.golang.org/grpc/health"
+	healthpb "google.golang.org/grpc/health/grpc_health_v1"
 	"google.golang.org/grpc/reflection"
 )
 
@@ -101,6 +103,7 @@ func main() {
 
 	// Track services for shutdown
 	var grpcServer *grpc.Server
+	var grpcHealth *grpchealth.Server
 	var mcpAgent *mcp.Agent
 	var webServer *http.Server
 	var healthServer *http.Server
@@ -113,6 +116,11 @@ func main() {
 
 		agent.RegisterRTBExtensionPointServer(grpcServer, artfAgent)
 		reflection.Register(grpcServer)
+
+		// Standard gRPC health service for orchestrators that probe over gRPC
+		grpcHealth = grpchealth.NewServer()
+		grpcHealth.SetServingStatus("", healthpb.HealthCheckResponse_NOT_SERVING)
+		healthpb.RegisterHealthServer(grpcServer, grpcHealth)
 
 		grpcListenAddr := fmt.Sprintf("%s:%d", *listenAddr, *grpcPort)
 		grpcListener, err := net.Listen("tcp", grpcListenAddr)
@@ -262,6 +270,9 @@ func main() {
 
 	// Mark agent as ready
 	healthChecker.SetReady(true)
+	if grpcHealth != nil {
+		grpcHealth.SetServingStatus("", healthpb.HealthCheckResponse_SERVING)
+	}
 	log.Printf("Agent is ready to accept requests")
 
 	// Print service URLs
@@ -276,6 +287,9 @@ func main() {
 
 	// Mark as not ready during shutdown
 	healthChecker.SetReady(false)
+	if grpcHealth != nil {
+		grpcHealth.Shutdown()
+	}
 
 	// Graceful shutdown with timeout
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)

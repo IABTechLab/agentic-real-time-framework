@@ -28,6 +28,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .unwrap();
     let agentic_rtb_framework_service = RtbExtensionPointServer::new(RtbExtensionPointService::default());
 
+    // Standard gRPC health service for orchestrators that probe over gRPC
+    let (health_reporter, health_service) = tonic_health::server::health_reporter();
+    health_reporter
+        .set_serving::<RtbExtensionPointServer<RtbExtensionPointService>>()
+        .await;
+
     println!("Agentic RTB Framework API Version: {}", API_VERSION);
     println!("Agentic RTB Framework Model Version: {}", MODEL_VERSION);
     println!(
@@ -47,6 +53,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let grpc_server = tokio::spawn(async move {
         Server::builder()
             .concurrency_limit_per_connection(max_server_connection as usize)
+            .add_service(health_service)
             .add_service(agentic_rtb_framework_service)
             .serve(grpc_addr)
             .await
