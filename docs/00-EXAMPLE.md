@@ -292,6 +292,7 @@ Detailed guides for each intent live in `docs/intents/`.
 | Port | Service | Method | Description |
 |------|---------|--------|-------------|
 | 50051 | RTBExtensionPoint | GetMutations | Process bid request and return mutations |
+| 50051 | grpc.health.v1.Health | Check, Watch | Standard gRPC health check; `SERVING` once the agent is ready |
 
 ### Health Check HTTP Endpoints
 
